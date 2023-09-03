@@ -68,19 +68,23 @@ let tileMatrix=[];
 let rowSize = 7;
 let numRows = 5;
 for (let i=0; i<numRows; i++){
-    tileMatrix.push(new Array(rowSize).fill(1))
+    let row = []
+    for(let j=0; j< rowSize; j++){
+        row.push(new Tile(generateColor()))
+    }
+    tileMatrix.push(row);
 }
 
-tileMatrix[0][5] =0;
-tileMatrix[1][2] =0;
-//tileMatrix[1][3] =0;
-tileMatrix[0][6] =0;
+tileMatrix[0][5].active =false;
+tileMatrix[1][2].active =false;
+//tileMatrix[1][3].active =false;
+tileMatrix[0][6].active =false;
 console.log(tileMatrix)
 
-
-function generatedColor(){
+function Tile(color){
+    this.color =color;
+    this.active = true;
 }
-
 function createTile(x, y, z, color){
     // create box
     let boxGeometry = new THREE.BoxGeometry(1, 0.5, 0.5);
@@ -93,7 +97,7 @@ function createTile(x, y, z, color){
     scene.add(box);
 }
 
-function colorGenerated(){
+function generateColor(){
     let colorPalette = ["rgb(0,255,100)", "rgb(255,0,255)", "rgb(255,255, 0)", "rgb(255,0,0)"]
     return colorPalette[Math.floor(Math.random() * (colorPalette.length))]
 }
@@ -104,8 +108,8 @@ function renderTiles(){
 
     for(let i=0; i<numRows; i++){
         for(let j=0; j<rowSize; j++){
-            if(tileMatrix[i][j] == 1){
-                createTile(1+j*offsetx, 12+i*offsety, 0, colorGenerated())
+            if(tileMatrix[i][j].active){
+                createTile(1+j*offsetx, 12+i*offsety, 0, tileMatrix[i][j].color)
             }
         }
     }
@@ -119,7 +123,7 @@ function onMouseMove(event)
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
     let pointer = new THREE.Vector2();
-    pointer.x =  (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.x =  (event.clientX / window.innerWidth) * 5 + 1.5;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     base.position.set(pointer.x, 2.0, 0.0);
