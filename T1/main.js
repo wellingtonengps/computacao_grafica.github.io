@@ -8,6 +8,7 @@ import {
   InfoBox,
   onWindowResize,
   createGroundPlaneXZ,
+  SecondaryBox,
 } from "../libs/util/util.js";
 
 let scene, renderer, camera, material, light, orbit; // Initial variables
@@ -64,17 +65,27 @@ scene.add(base);
 
 // Use this to show information onscreen
 let controls = new InfoBox();
-controls.add("Basic Scene");
-controls.addParagraph();
+controls.add("oi");
 controls.add("Use mouse to interact:");
 controls.add("* Left button to rotate");
 controls.add("* Right button to translate (pan)");
 controls.add("* Scroll to zoom in/out.");
 controls.show();
 
+var positionMessage = new SecondaryBox("");
+positionMessage.changeStyle("rgba(0,0,0,0)", "lightgray", "16px", "ubuntu");
+
+function updatePositionMessage(text) {
+  var str = text;
+  positionMessage.changeMessage(str);
+}
+
 let tileMatrix = [];
 let rowSize = 7;
 let numRows = 5;
+let tileWallStartX = 1;
+let tileWallStarty = 12;
+
 for (let i = 0; i < numRows; i++) {
   let row = [];
   for (let j = 0; j < rowSize; j++) {
@@ -83,15 +94,16 @@ for (let i = 0; i < numRows; i++) {
   tileMatrix.push(row);
 }
 
-tileMatrix[0][5].active = false;
-tileMatrix[1][2].active = false;
+//tileMatrix[0][5].active = false;
+//tileMatrix[1][2].active = false;
 //tileMatrix[1][3].active =false;
-tileMatrix[0][6].active = false;
+//tileMatrix[0][6].active = false;
 console.log(tileMatrix);
 
 function Tile(color) {
   this.color = color;
   this.active = true;
+  this.object = null;
 }
 function createTile(x, y, z, color) {
   // create box
@@ -123,13 +135,48 @@ function renderTiles() {
     for (let j = 0; j < rowSize; j++) {
       if (tileMatrix[i][j].active) {
         createTile(
-          1 + j * offsetx,
-          12 + i * offsety,
+          tileWallStartX + j * offsetx,
+          tileWallStarty + i * offsety,
           0,
           tileMatrix[i][j].color
         );
       }
     }
+  }
+}
+
+function getTileByPosition(x, y) {
+  let coll = Math.floor(x / 1);
+  let row = Math.floor((y - tileWallStarty) / 0.5);
+
+  //console.log("row: " + row + ", " + "col: " + coll);
+
+  return [coll, row];
+}
+
+function tileColision() {
+  let posVector = new THREE.Vector3();
+  sphereBox.getWorldPosition(posVector);
+  let sphereX = posVector.x;
+  let sphereY = posVector.y;
+
+  //console.log("x :" + sphereX + " y: " + sphereY);
+  updatePositionMessage(
+    "{" + sphereX.toFixed(2) + ", " + sphereY.toFixed(2) + "}"
+  );
+
+  if (
+    sphereY >= tileWallStarty &&
+    sphereY <= tileWallStarty + 5 * 0.5 &&
+    sphereX >= tileWallStartX &&
+    sphereX <= tileWallStartX + 1 * 7
+  ) {
+    console.log("x :" + sphereX + " y: " + sphereY);
+    console.log(getTileByPosition(sphereX, sphereY));
+    let tilePos = getTileByPosition(sphereX, sphereY);
+    tileMatrix[0][5].active = false;
+    console.log(tileMatrix[0][5]);
+    renderTiles();
   }
 }
 
@@ -148,13 +195,11 @@ function onMouseMove(event) {
 }
 let xAmount = 0;
 let yAmount = 0;
-let angle = 0 * Math.PI;
+let speed = 0.2;
+let moveVector = new THREE.Vector3(0.05, 0.1, 0.0);
 function moveSphere() {
-  yAmount = yAmount + 0.05;
-  xAmount = yAmount * Math.cos(angle);
-
-  //sphereBox.translateX(xAmount);
-  //sphereBox.translateY(yAmount);
+  xAmount = xAmount + speed * moveVector.x;
+  yAmount = yAmount + speed * moveVector.y;
 
   sphereBox.matrixAutoUpdate = false;
 
@@ -163,7 +208,7 @@ function moveSphere() {
 
   sphereBox.matrix.multiply(
     mat4.makeTranslation(0 + xAmount, 0 + yAmount, 0.0)
-  ); // T1
+  );
 }
 
 function createBackgroundPlane() {
@@ -184,6 +229,10 @@ createBackgroundPlane();
 render();
 function render() {
   requestAnimationFrame(render);
+  updatePositionMessage();
   moveSphere();
+  tileColision();
   renderer.render(scene, camera); // Render scene
 }
+
+//10.5.190.118
