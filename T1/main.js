@@ -29,6 +29,17 @@ window.addEventListener(
 );
 window.addEventListener("mousemove", onMouseMove);
 
+let tileMatrix = [];
+let rowSize = 7;
+let numRows = 5;
+let tileWallStartX = 0.5 ;
+let tileWallStarty = 12;
+let tileWidth = 1.0;
+let tileHeight = 0.5;
+let sphereRadius = 0.2;
+let baseStartPos = new THREE.Vector3(3.0,2.0,0.0)
+let baseHeight = 0.5;
+
 // Show axes (parameter is size of each axis)
 let axesHelper = new THREE.AxesHelper(12);
 scene.add(axesHelper);
@@ -42,7 +53,7 @@ let leftBoxGeometry = new THREE.BoxGeometry(0.5, 16, 0.5);
 let rightBoxGeometry = new THREE.BoxGeometry(0.5, 16, 0.5);
 let topBoxGeometry = new THREE.BoxGeometry(8, 0.5, 0.5);
 let baseGeometry = new THREE.BoxGeometry(2, 0.5, 0.5);
-let sphereGeometry = new THREE.SphereGeometry(0.2, 32, 16);
+let sphereGeometry = new THREE.SphereGeometry(sphereRadius, 32, 16);
 
 let leftBox = new THREE.Mesh(leftBoxGeometry, material);
 let rightBox = new THREE.Mesh(rightBoxGeometry, material);
@@ -54,8 +65,8 @@ let sphereBox = new THREE.Mesh(sphereGeometry, material);
 leftBox.position.set(0.25, 8.0, 0.0);
 rightBox.position.set(7.75, 8.0, 0.0);
 topBox.position.set(4.0, 16, 0.0);
-base.position.set(3.0, 2, 0);
-sphereBox.position.set(1.0, 5, 0);
+base.position.set(baseStartPos.x, baseStartPos.y, baseStartPos.z);
+sphereBox.position.set(baseStartPos.x,  baseStartPos.y + baseHeight/2 + sphereRadius, 0);
 // add the cube to the scene
 scene.add(leftBox);
 scene.add(rightBox);
@@ -80,11 +91,6 @@ function updatePositionMessage(text) {
   positionMessage.changeMessage(str);
 }
 
-let tileMatrix = [];
-let rowSize = 7;
-let numRows = 5;
-let tileWallStartX = 1;
-let tileWallStarty = 12;
 
 for (let i = 0; i < numRows; i++) {
   let row = [];
@@ -114,8 +120,10 @@ function createTile(x, y, z, color) {
   box.position.set(x, y, z);
 
   // add the cube to the scene
-  scene.add(box);
+  return box;
+  //scene.add(box);
 }
+
 
 function generateColor() {
   let colorPalette = [
@@ -128,26 +136,23 @@ function generateColor() {
 }
 
 function renderTiles() {
-  let offsetx = 1.0;
+  let offsetx =1.0;
   let offsety = 0.5;
 
   for (let i = 0; i < numRows; i++) {
     for (let j = 0; j < rowSize; j++) {
-      if (tileMatrix[i][j].active) {
-        createTile(
-          tileWallStartX + j * offsetx,
-          tileWallStarty + i * offsety,
-          0,
-          tileMatrix[i][j].color
-        );
-      }
+     // if (tileMatrix[i][j].active) {
+        let tile = createTile(tileWallStartX + tileWidth/2+ j * tileWidth, tileWallStarty + tileHeight /2+ i * tileHeight, 0, tileMatrix[i][j].color);
+        scene.add(tile);
+        tileMatrix[i][j].object = tile;
+     // }
     }
   }
 }
 
 function getTileByPosition(x, y) {
-  let coll = Math.floor(x / 1);
-  let row = Math.floor((y - tileWallStarty) / 0.5);
+  let coll = Math.floor((x - tileWallStartX)/ tileWidth);
+  let row = Math.floor((y - tileWallStarty ) / tileHeight);
 
   //console.log("row: " + row + ", " + "col: " + coll);
 
@@ -166,17 +171,17 @@ function tileColision() {
   );
 
   if (
-    sphereY >= tileWallStarty &&
-    sphereY <= tileWallStarty + 5 * 0.5 &&
-    sphereX >= tileWallStartX &&
-    sphereX <= tileWallStartX + 1 * 7
+    sphereY >= tileWallStarty -sphereRadius &&
+    sphereY <= tileWallStarty + tileHeight* numRows + sphereRadius  &&
+    sphereX >= tileWallStartX -sphereRadius &&
+    sphereX <= tileWallStartX + tileWidth * rowSize + sphereRadius
   ) {
-    console.log("x :" + sphereX + " y: " + sphereY);
-    console.log(getTileByPosition(sphereX, sphereY));
-    let tilePos = getTileByPosition(sphereX, sphereY);
-    tileMatrix[0][5].active = false;
-    console.log(tileMatrix[0][5]);
-    renderTiles();
+    //console.log("x :" + sphereX + " y: " + sphereY);
+    //console.log(getTileByPosition(sphereX, sphereY));
+    let tilePos = getTileByPosition(sphereX + sphereRadius, sphereY + sphereRadius);
+    //console.log(tileMatrix[tilePos[1]][tilePos[0]]);
+    tileMatrix[tilePos[1]][tilePos[0]].object.visible = false;
+
   }
 }
 
@@ -193,13 +198,23 @@ function onMouseMove(event) {
   base.position.set(pointer.x, 2.0, 0.0);
   //console.log(pointer)
 }
-let xAmount = 0;
-let yAmount = 0;
-let speed = 0.2;
-let moveVector = new THREE.Vector3(0.05, 0.1, 0.0);
+
+function Movement(speed, direction) {
+  this.speed =speed;
+  this.vector = direction;
+}
+
+let sphereMovement =  new Movement(0.2, new THREE.Vector3(0.05, 0.1, 0.0));
+
 function moveSphere() {
-  xAmount = xAmount + speed * moveVector.x;
-  yAmount = yAmount + speed * moveVector.y;
+
+  let posVector = new THREE.Vector3();
+  sphereBox.getWorldPosition(posVector);
+  let sphereX = posVector.x;
+  let sphereY = posVector.y;
+
+  const xAmount = sphereMovement.speed * sphereMovement.vector.x;
+  const yAmount = sphereMovement.speed * sphereMovement.vector.y;
 
   sphereBox.matrixAutoUpdate = false;
 
@@ -207,7 +222,7 @@ function moveSphere() {
   sphereBox.matrix.identity(); // reset matrix
 
   sphereBox.matrix.multiply(
-    mat4.makeTranslation(0 + xAmount, 0 + yAmount, 0.0)
+    mat4.makeTranslation(sphereX + xAmount, sphereY + yAmount, 0.0)
   );
 }
 
@@ -230,7 +245,7 @@ render();
 function render() {
   requestAnimationFrame(render);
   updatePositionMessage();
-  moveSphere();
+  //moveSphere();
   tileColision();
   renderer.render(scene, camera); // Render scene
 }
