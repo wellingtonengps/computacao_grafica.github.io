@@ -10,14 +10,21 @@ import {
   createGroundPlaneXZ,
   SecondaryBox,
 } from "../libs/util/util.js";
+import KeyboardState from "../libs/util/KeyboardState.js";
 
 let scene, renderer, camera, material, light, orbit; // Initial variables
+let gameStarted = false;
+var keyboard = new KeyboardState();
 scene = new THREE.Scene(); // Create main scene
 renderer = initRenderer(); // Init a basic renderer
-camera = initCamera(new THREE.Vector3(0, 15, 30)); // Init camera in this position
+camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000); // Init camera in this position
+camera.position.set(4, 8, 8.25)
 material = setDefaultMaterial(); // create a basic material
 light = initDefaultBasicLight(scene); // Create a basic light to illuminate the scene
 orbit = new OrbitControls(camera, renderer.domElement); // Enable mouse rotation, pan, zoom etc.
+camera.lookAt(4, 8, 0);
+camera.fov = 90;
+camera.updateProjectionMatrix();
 
 // Listen window size changes
 window.addEventListener(
@@ -40,6 +47,23 @@ let sphereRadius = 0.2;
 let baseStartPos = new THREE.Vector3(3.0,2.0,0.0)
 let baseHeight = 0.5;
 
+/*
+let asset = {
+  object: null,
+  bb: new THREE.Box3()
+}
+
+let assetHelper = createBBHelper(asset.bb, 'yellow')
+*/
+
+function createBBHelper(bb, color)
+{
+  // Create a bounding box helper
+  let helper = new THREE.Box3Helper( bb, color );
+  scene.add( helper );
+  return helper;
+}
+
 // Show axes (parameter is size of each axis)
 let axesHelper = new THREE.AxesHelper(12);
 scene.add(axesHelper);
@@ -61,6 +85,66 @@ let topBox = new THREE.Mesh(topBoxGeometry, material);
 let base = new THREE.Mesh(baseGeometry, material);
 let sphereBox = new THREE.Mesh(sphereGeometry, material);
 
+let bbLeftBox = new THREE.Box3().setFromObject(leftBox);
+createBBHelper(bbLeftBox,'white');
+
+let bbRightBox = new THREE.Box3().setFromObject(rightBox);
+createBBHelper(bbRightBox,'white');
+
+let bbTopBox = new THREE.Box3().setFromObject(topBox);
+createBBHelper(bbTopBox,'white');
+
+let bbBase = new THREE.Box3().setFromObject(base);
+createBBHelper(bbBase,'white');
+
+let bbSphere = new THREE.Box3().setFromObject(sphereBox);
+createBBHelper(bbSphere,'white');
+
+function keyboardUpdate() {
+
+  keyboard.update();
+  // Keyboard.down - execute only once per key pressed
+  if ( keyboard.down("R") ){
+    console.log("R")
+    gameStarted = true;
+  }
+
+}
+
+function checkCollisions(object)
+{
+  let collisionBase = bbBase.intersectsBox(object);
+  let collisionLeft = bbLeftBox.intersectsBox(object);
+  let collisionRight = bbRightBox.intersectsBox(object);
+  let collisionTop = bbTopBox.intersectsBox(object);
+
+  if(collisionBase ){
+    console.log("Base collision detected")
+    reflectSphere(new THREE.Vector3(0,1,0));
+  }
+  else if(collisionLeft){
+    console.log("Left collision detected")
+    reflectSphere(new THREE.Vector3(1,0,0));
+  }
+  else if(collisionRight){
+    console.log("Right collision detected")
+    reflectSphere(new THREE.Vector3(-1,0,0));
+  }
+  else if(collisionTop){
+    console.log("Top collision detected")
+    reflectSphere(new THREE.Vector3(0,-1,0));
+  }
+}
+
+function updateAsset()
+{
+  bbBase.setFromObject(base);
+  bbSphere.setFromObject(sphereBox);
+  bbLeftBox.setFromObject(leftBox);
+  bbRightBox.setFromObject(rightBox);
+  bbTopBox.setFromObject(topBox)
+}
+
 // position the cube
 leftBox.position.set(0.25, 8.0, 0.0);
 rightBox.position.set(7.75, 8.0, 0.0);
@@ -76,7 +160,6 @@ scene.add(base);
 
 // Use this to show information onscreen
 let controls = new InfoBox();
-controls.add("oi");
 controls.add("Use mouse to interact:");
 controls.add("* Left button to rotate");
 controls.add("* Right button to translate (pan)");
@@ -90,7 +173,6 @@ function updatePositionMessage(text) {
   var str = text;
   positionMessage.changeMessage(str);
 }
-
 
 for (let i = 0; i < numRows; i++) {
   let row = [];
@@ -159,7 +241,28 @@ function getTileByPosition(x, y) {
   return [coll, row];
 }
 
-function tileColision() {
+/*
+function baseCollision() {
+  let posVectorBase = new THREE.Vector3();
+  base.getWorldPosition(posVectorBase);
+
+  let posVectorSphere = new THREE.Vector3();
+  sphereBox.getWorldPosition(posVectorSphere);
+
+  let baseX = posVectorBase.x;
+  let baseY = posVectorBase.y;
+
+
+  let sphereX = posVectorSphere.x;
+  let sphereY = posVectorSphere.y;
+
+  if((sphereY <=  baseY) && ((sphereX >= (baseX - 1)) && sphereX <= (baseX + 1))){
+    console.log("bateu");
+    reflectSphere(new THREE.Vector3(0, 1, 0));
+  }
+}*/
+
+function tileCollision() {
   let posVector = new THREE.Vector3();
   sphereBox.getWorldPosition(posVector);
   let sphereX = posVector.x;
@@ -180,7 +283,12 @@ function tileColision() {
     //console.log(getTileByPosition(sphereX, sphereY));
     let tilePos = getTileByPosition(sphereX + sphereRadius, sphereY + sphereRadius);
     //console.log(tileMatrix[tilePos[1]][tilePos[0]]);
-    tileMatrix[tilePos[1]][tilePos[0]].object.visible = false;
+
+    if(tileMatrix[tilePos[1]][tilePos[0]].active){
+      tileMatrix[tilePos[1]][tilePos[0]].active = false;
+      tileMatrix[tilePos[1]][tilePos[0]].object.visible = false;
+      reflectSphere(new THREE.Vector3(0, -1, 0));
+    }
 
   }
 }
@@ -204,7 +312,12 @@ function Movement(speed, direction) {
   this.vector = direction;
 }
 
-let sphereMovement =  new Movement(0.2, new THREE.Vector3(0.05, 0.1, 0.0));
+function reflectSphere(normal) {
+    //let normal = new THREE.Vector3(0, -1, 0);
+    sphereMovement.vector =  sphereMovement.vector.reflect(normal);
+}
+
+let sphereMovement =  new Movement(0.2, new THREE.Vector3(0.2, 1, 0.0));
 
 function moveSphere() {
 
@@ -213,8 +326,8 @@ function moveSphere() {
   let sphereX = posVector.x;
   let sphereY = posVector.y;
 
-  const xAmount = sphereMovement.speed * sphereMovement.vector.x;
-  const yAmount = sphereMovement.speed * sphereMovement.vector.y;
+  const xAmount = (sphereMovement.speed) * sphereMovement.vector.x;
+  const yAmount = (sphereMovement.speed) * sphereMovement.vector.y;
 
   sphereBox.matrixAutoUpdate = false;
 
@@ -243,10 +356,17 @@ function createBackgroundPlane() {
 createBackgroundPlane();
 render();
 function render() {
+  keyboardUpdate();
+
+  if(gameStarted){
+    updatePositionMessage();
+    moveSphere();
+    updateAsset();
+    checkCollisions(bbSphere);
+    tileCollision();
+
+  }
   requestAnimationFrame(render);
-  updatePositionMessage();
-  //moveSphere();
-  tileColision();
   renderer.render(scene, camera); // Render scene
 }
 
