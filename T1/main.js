@@ -13,7 +13,7 @@ import {
 import KeyboardState from "../libs/util/KeyboardState.js";
 
 let scene, renderer, camera, material, light, orbit; // Initial variables
-let gameStarted = false;
+let gamePaused = true;
 var keyboard = new KeyboardState();
 scene = new THREE.Scene(); // Create main scene
 renderer = initRenderer(); // Init a basic renderer
@@ -44,7 +44,7 @@ let tileWallStarty = 12;
 let tileWidth = 1.0;
 let tileHeight = 0.5;
 let sphereRadius = 0.2;
-let baseStartPos = new THREE.Vector3(3.0,2.0,0.0)
+let baseStartPos = new THREE.Vector3(4.0,2.0,0.0)
 let baseHeight = 0.5;
 
 /*
@@ -73,6 +73,8 @@ let plane = createGroundPlaneXZ(20, 20);
 scene.add(plane);
 
 // create objects
+let backgroundPlane =  createBackgroundPlane();
+scene.add(backgroundPlane);
 let leftBoxGeometry = new THREE.BoxGeometry(0.5, 16, 0.5);
 let rightBoxGeometry = new THREE.BoxGeometry(0.5, 16, 0.5);
 let topBoxGeometry = new THREE.BoxGeometry(8, 0.5, 0.5);
@@ -106,8 +108,14 @@ function keyboardUpdate() {
   // Keyboard.down - execute only once per key pressed
   if ( keyboard.down("R") ){
     console.log("R")
-    gameStarted = true;
+    gamePaused = true;
+    restartGame();
   }
+
+  else if(keyboard.down("space")){
+    gamePaused = !gamePaused;
+  }
+
 
 }
 
@@ -217,6 +225,14 @@ function generateColor() {
   return colorPalette[Math.floor(Math.random() * colorPalette.length)];
 }
 
+function restartGame(){
+  base.matrixAutoUpdate = true;
+  sphereBox.matrixAutoUpdate=true;
+  base.position.set(baseStartPos.x, baseStartPos.y, baseStartPos.z);
+  sphereBox.position.set(baseStartPos.x,  baseStartPos.y + baseHeight/2 + sphereRadius, 0);
+  updateAsset();
+}
+
 function renderTiles() {
   let offsetx =1.0;
   let offsety = 0.5;
@@ -275,14 +291,14 @@ function tileCollision() {
 
   if (
     sphereY >= tileWallStarty -sphereRadius &&
-    sphereY <= tileWallStarty + tileHeight* numRows + sphereRadius  &&
+    sphereY <= tileWallStarty + tileHeight* numRows - sphereRadius  &&
     sphereX >= tileWallStartX -sphereRadius &&
-    sphereX <= tileWallStartX + tileWidth * rowSize + sphereRadius
+    sphereX <= tileWallStartX + tileWidth * rowSize - sphereRadius
   ) {
     //console.log("x :" + sphereX + " y: " + sphereY);
     //console.log(getTileByPosition(sphereX, sphereY));
     let tilePos = getTileByPosition(sphereX + sphereRadius, sphereY + sphereRadius);
-    //console.log(tileMatrix[tilePos[1]][tilePos[0]]);
+    console.log(tilePos[1]+", "+tilePos[0]);
 
     if(tileMatrix[tilePos[1]][tilePos[0]].active){
       tileMatrix[tilePos[1]][tilePos[0]].active = false;
@@ -294,19 +310,50 @@ function tileCollision() {
 }
 
 renderTiles();
+
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
 function onMouseMove(event) {
   //leftBox.changeMessage("Intersection: None");
   //intersectionSphere.visible = false;
   // calculate pointer position in normalized device coordinates
   // (-1 to +1) for both components
-  let pointer = new THREE.Vector2();
-  pointer.x = (event.clientX / window.innerWidth) * 5 + 1.5;
+  event.preventDefault();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+
+
+ // let pointer = new THREE.Vector2();
+  //pointer.x = (event.clientX / window.innerWidth) * 5 + 1.5;
   //pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-  base.position.set(pointer.x, 2.0, 0.0);
+  //base.position.set(pointer.x, 2.0, 0.0);
   //console.log(pointer)
 }
 
+function moveBaseToRaycasterXPosition(scene, camera) {
+  camera.updateMatrixWorld();
+  raycaster.setFromCamera(mouse, camera);
+  let v = new THREE.Vector3()
+
+  var intersects = raycaster.intersectObject(backgroundPlane);
+
+  if (intersects.length > 0) {
+    let x = intersects[0].point.x;
+  //  console.log(x)
+    base.position.set(x, 2.0, 0.0)
+    if(x<= 0.50 + 1){
+      //todo: tirar números mágicos
+      base.position.set(0.50 + 1, 2.0, 0.0)
+    }
+    else if(x >= 8 -0.5-1){
+      base.position.set(8 -0.5-1, 2.0, 0.0)
+    }
+
+  }
+
+}
 function Movement(speed, direction) {
   this.speed =speed;
   this.vector = direction;
@@ -350,7 +397,7 @@ function createBackgroundPlane() {
 
   let backgroundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
   backgroundPlane.position.set(4, 8, 0);
-  scene.add(backgroundPlane);
+  return backgroundPlane;
 }
 
 createBackgroundPlane();
@@ -358,13 +405,13 @@ render();
 function render() {
   keyboardUpdate();
 
-  if(gameStarted){
+  if(!gamePaused){
     updatePositionMessage();
     moveSphere();
     updateAsset();
     checkCollisions(bbSphere);
     tileCollision();
-
+    moveBaseToRaycasterXPosition(scene, camera);
   }
   requestAnimationFrame(render);
   renderer.render(scene, camera); // Render scene
