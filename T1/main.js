@@ -126,9 +126,52 @@ function checkCollisions(object)
   let collisionRight = bbRightBox.intersectsBox(object);
   let collisionTop = bbTopBox.intersectsBox(object);
 
+
   if(collisionBase ){
+
+    let vet1 = new THREE.Vector3(0.15, -0.98, 0);
+    let vet2 = new THREE.Vector3(-0.95, -0.30, 0);
+    let vet3 = new THREE.Vector3(0,1,0);
+    let vet4 = new THREE.Vector3(0.95, -0.30, 0);
+    let vet5 = new THREE.Vector3(-0.15, -0.98, 0);
+
+    let vet6 = new THREE.Vector3();
+    let vet7 = new THREE.Vector3();
+
+
+    let spherePos = new THREE.Vector3();
+    sphereBox.getWorldPosition(spherePos);
+    let basePos = new THREE.Vector3();
+    base.getWorldPosition(basePos);
+
+    let relativePosX = spherePos.x - basePos.x;
+    let normal;
+
+    console.log(relativePosX)
+
+    if(relativePosX <= -1.0){
+      normal = new THREE.Vector3(-1, 0, 0)
+    }
+    else if(relativePosX <=-0.6){
+      normal = vet5;
+    }else if(relativePosX <= -0.2){
+      normal = vet4;
+    }else if(relativePosX <= 0.2){
+      normal = vet3;
+    }else if(relativePosX <= 0.6){
+      normal = vet2;
+    }else if(relativePosX <= 1.0){
+      normal = vet1;
+    }
+    else if(relativePosX > 1.0){
+      normal = new THREE.Vector3(1, 0, 0)
+
+    }
+
+
+    console.log(relativePosX)
     console.log("Base collision detected")
-    reflectSphere(new THREE.Vector3(0,1,0));
+    reflectSphere(normal);
   }
   else if(collisionLeft){
     console.log("Left collision detected")
@@ -158,7 +201,7 @@ leftBox.position.set(0.25, 8.0, 0.0);
 rightBox.position.set(7.75, 8.0, 0.0);
 topBox.position.set(4.0, 16, 0.0);
 base.position.set(baseStartPos.x, baseStartPos.y, baseStartPos.z);
-sphereBox.position.set(baseStartPos.x,  baseStartPos.y + baseHeight/2 + sphereRadius, 0);
+sphereBox.position.set(baseStartPos.x,  baseStartPos.y + 0.01 + baseHeight/2 + sphereRadius, 0);
 // add the cube to the scene
 scene.add(leftBox);
 scene.add(rightBox);
@@ -230,6 +273,7 @@ function restartGame(){
   sphereBox.matrixAutoUpdate=true;
   base.position.set(baseStartPos.x, baseStartPos.y, baseStartPos.z);
   sphereBox.position.set(baseStartPos.x,  baseStartPos.y + baseHeight/2 + sphereRadius, 0);
+  sphereMovement.vector = new THREE.Vector3(0,1,0)
   updateAsset();
 }
 
@@ -364,7 +408,7 @@ function reflectSphere(normal) {
     sphereMovement.vector =  sphereMovement.vector.reflect(normal);
 }
 
-let sphereMovement =  new Movement(0.2, new THREE.Vector3(0.2, 1, 0.0));
+let sphereMovement =  new Movement(0.2, new THREE.Vector3(0.0, 1, 0.0));
 
 function moveSphere() {
 
