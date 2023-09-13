@@ -219,8 +219,18 @@ function keyboardUpdate() {
         if(!gameStarted){
             gameStarted = true;
         }
+    } else if (keyboard.down("enter")){
+        toggleFullScreenMode();
     }
 
+}
+
+function toggleFullScreenMode(){
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
 }
 
 function checkCollisions(object) {
@@ -248,7 +258,7 @@ function checkCollisions(object) {
         let limit =  Math.PI/2;
         console.log("Base collision detected: " + relativePosX)
 
-        if (relativePosX <= -1.0) {
+        if (relativePosX <= -1.0 - sphereRadius) {
             normal = new THREE.Vector3(-1, 0, 0)
             console.log("Reflecting")
             limit = null;
@@ -272,11 +282,10 @@ function checkCollisions(object) {
             normal = vet1;
             console.log("Reflecting")
 
-        } else if (relativePosX => 1.0) {
+        } else if (relativePosX => 1.0 + sphereRadius) {
             normal = new THREE.Vector3(1, 0, 0)
             console.log("Reflecting")
             limit = null;
-
         }
 
 
@@ -377,11 +386,11 @@ function baseCollision() {
   }
 }*/
 
-function tileCollision() {
-    let posVector = new THREE.Vector3();
-    sphereBox.getWorldPosition(posVector);
-    let sphereX = posVector.x;
-    let sphereY = posVector.y;
+function checkTileCollision() {
+    let spherePos = new THREE.Vector3();
+    sphereBox.getWorldPosition(spherePos);
+    let sphereX = spherePos.x;
+    let sphereY = spherePos.y;
 
     //console.log("x :" + sphereX + " y: " + sphereY);
     updatePositionMessage(
@@ -396,13 +405,41 @@ function tileCollision() {
     ) {
         //console.log("x :" + sphereX + " y: " + sphereY);
         //console.log(getTileByPosition(sphereX, sphereY));
-        let tilePos = getTileByPosition(sphereX + sphereRadius, sphereY + sphereRadius);
-        console.log(tilePos[1] + ", " + tilePos[0]);
+        let tilePosInMatrix = getTileByPosition(sphereX + sphereRadius, sphereY + sphereRadius);
+        console.log(tilePosInMatrix[1] + ", " + tilePosInMatrix[0]);
+        let collidedTile = tileMatrix[tilePosInMatrix[1]][tilePosInMatrix[0]];
 
-        if (tileMatrix[tilePos[1]][tilePos[0]].active) {
-            tileMatrix[tilePos[1]][tilePos[0]].active = false;
-            tileMatrix[tilePos[1]][tilePos[0]].object.visible = false;
-            reflectSphere(new THREE.Vector3(0, -1, 0), null);
+        let tilePosWorld = new THREE.Vector3();
+        collidedTile.object.getWorldPosition(tilePosWorld);
+
+        if (collidedTile.active) {
+            collidedTile.active = false;
+            collidedTile.object.visible = false;
+
+
+            if(sphereY < tilePosWorld.y - tileHeight/2){
+                reflectSphere(new THREE.Vector3(0, -1, 0), null);
+                console.log("bottom");
+                //gamePaused = true;
+
+            } if(sphereY > tilePosWorld.y + tileHeight/2){
+                reflectSphere(new THREE.Vector3(0, 1, 0), null);
+                console.log("top");
+                //gamePaused = true;
+            }
+
+            else if (sphereX < tilePosWorld.x - tileWidth/2){
+                reflectSphere(new THREE.Vector3(-1, 0, 0), null);
+                console.log("left");
+                //gamePaused = true;
+            }
+
+            else if (sphereX > tilePosWorld.x + tileWidth/2){
+                reflectSphere(new THREE.Vector3(1, 0, 0), null);
+                console.log("right");
+                //gamePaused = true;
+            }
+
         }
 
     }
@@ -534,7 +571,7 @@ function render() {
         moveSphere();
         updateAsset();
         checkCollisions(bbSphere);
-        tileCollision();
+        checkTileCollision();
 
     }
 
