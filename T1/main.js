@@ -13,13 +13,12 @@ import {
 import KeyboardState from "../libs/util/KeyboardState.js";
 
 let scene, renderer, camera, material, light, orbit; // Initial variables
-let gamePaused = true;
+let gamePaused = false;
 let gameStarted = false;
 var keyboard = new KeyboardState();
 scene = new THREE.Scene(); // Create main scene
 renderer = initRenderer(); // Init a basic renderer
 //camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000); // Init camera in this position
-
 let orthoSize = 16; // Estimated size for orthographic projection
 let w = window.innerWidth;
 let h = window.innerHeight
@@ -37,7 +36,7 @@ camera = new THREE.OrthographicCamera(-orthoSize * aspect / 2, orthoSize * aspec
 camera.position.set(4, 8, 8.25)
 material = setDefaultMaterial(); // create a basic material
 light = initDefaultBasicLight(scene); // Create a basic light to illuminate the scene
-orbit = new OrbitControls(camera, renderer.domElement); // Enable mouse rotation, pan, zoom etc.
+//orbit = new OrbitControls(camera, renderer.domElement); // Enable mouse rotation, pan, zoom etc.
 camera.lookAt(4, 8, 0);
 //camera.fov = 90;
 camera.updateProjectionMatrix();
@@ -70,6 +69,7 @@ function onWindowResize(camera, renderer, frustumSize = 16) {
 }
 
 window.addEventListener("mousemove", onMouseMove);
+window.addEventListener("click", onMouseClick);
 
 let tileMatrix = [];
 let rowSize = 7;
@@ -82,6 +82,8 @@ let sphereRadius = 0.2;
 let baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
 let baseHeight = 0.5;
 let baseWidth = 1.0  ;
+
+let count=0;
 /*
 let asset = {
   object: null,
@@ -165,7 +167,7 @@ let mouse = new THREE.Vector2();
 var positionMessage = new SecondaryBox("");
 positionMessage.changeStyle("rgba(0,0,0,0)", "lightgray", "16px", "ubuntu");
 
-let sphereMovement = new Movement(0.2, new THREE.Vector3(0.0, 1, 0.0));
+let sphereMovement = new Movement(0.2, new THREE.Vector3(0.0, 0.0, 0.0));
 
 
 for (let i = 0; i < numRows; i++) {
@@ -215,10 +217,14 @@ function keyboardUpdate() {
         gameStarted = false;
         restartGame();
     } else if (keyboard.down("space")) {
-        gamePaused = !gamePaused;
-        if(!gameStarted){
-            gameStarted = true;
+
+        if(gameStarted){
+            gamePaused = !gamePaused;
         }
+
+        /*if(!gameStarted){
+            gameStarted = true;
+        }*/
     } else if (keyboard.down("enter")){
         toggleFullScreenMode();
     }
@@ -336,7 +342,8 @@ function restartGame() {
     sphereBox.matrixAutoUpdate = true;
     base.position.set(baseStartPos.x, baseStartPos.y, baseStartPos.z);
     sphereBox.position.set(baseStartPos.x, baseStartPos.y + baseHeight / 2 + sphereRadius, 0);
-    sphereMovement.vector = new THREE.Vector3(0, 1, 0);
+    sphereMovement.vector = new THREE.Vector3(0, 0, 0);
+    count = 0;
     resetTiles();
     updateAsset();
 }
@@ -386,6 +393,27 @@ function baseCollision() {
   }
 }*/
 
+function checkGameOver(){
+    let spherePos = new THREE.Vector3();
+    sphereBox.getWorldPosition(spherePos);
+    let sphereY = spherePos.y;
+
+    if(sphereY <= 0){
+        gameStarted = false;
+        //gamePaused = true;
+        sphereMovement.vector = new THREE.Vector3(0, 0, 0);
+    }
+}
+
+function checkWinGame() {
+
+    let total = numRows * rowSize;
+    if(count == total){
+        gamePaused = true;
+    }
+}
+
+
 function checkTileCollision() {
     let spherePos = new THREE.Vector3();
     sphereBox.getWorldPosition(spherePos);
@@ -415,6 +443,7 @@ function checkTileCollision() {
         if (collidedTile.active) {
             collidedTile.active = false;
             collidedTile.object.visible = false;
+            count++
 
 
             if(sphereY < tilePosWorld.y - tileHeight/2){
@@ -447,21 +476,19 @@ function checkTileCollision() {
 
 
 function onMouseMove(event) {
-    //leftBox.changeMessage("Intersection: None");
-    //intersectionSphere.visible = false;
-    // calculate pointer position in normalized device coordinates
-    // (-1 to +1) for both components
+
     event.preventDefault();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
 
+function onMouseClick(event){
 
-    // let pointer = new THREE.Vector2();
-    //pointer.x = (event.clientX / window.innerWidth) * 5 + 1.5;
-    //pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    //base.position.set(pointer.x, 2.0, 0.0);
-    //console.log(pointer)
+    if(event.button == 0 && gameStarted == false){
+        sphereMovement.vector = new THREE.Vector3(0,1,0);
+        gameStarted = true;
+        console.log("Click")
+    }
 }
 
 function moveBaseToRaycasterXPosition(scene, camera) {
@@ -572,14 +599,15 @@ function render() {
         updateAsset();
         checkCollisions(bbSphere);
         checkTileCollision();
-
+        checkGameOver();
+        moveBaseToRaycasterXPosition(scene, camera);
+        checkWinGame();
     }
 
     if(!gameStarted){
         sphereFollowBase();
+        moveBaseToRaycasterXPosition(scene, camera);
     }
-
-    moveBaseToRaycasterXPosition(scene, camera);
 
     requestAnimationFrame(render);
     renderer.render(scene, camera); // Render scene
