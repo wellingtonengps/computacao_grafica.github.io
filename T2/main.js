@@ -8,6 +8,7 @@ import {
 } from "../libs/util/util.js";
 import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile} from "./components.js";
+import {CollisionManager} from "./collisionManager.js";
 
 // Initial variables
 let gamePaused = false;
@@ -36,7 +37,7 @@ let sphereRadius = 0.2;
 let baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
 let baseHeight = 0.5;
 let baseWidth = 1.0;
-
+let collisionManager = new CollisionManager();
 
 let countTiles= 0;
 
@@ -101,6 +102,7 @@ let sphereBox = new THREE.Mesh(sphereGeometry, material);
 let base = new Base(baseHeight, baseWidth, 0.5, baseStartPos.x, baseStartPos.y, baseStartPos.z)
 scene.add(base.getObject())
 
+collisionManager.registerCollidable(base)
 
 
 let ball = new Ball(sphereRadius, baseStartPos.x, baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0)
@@ -130,6 +132,9 @@ positionMessage.changeStyle("rgba(0,0,0,0)", "lightgray", "16px", "ubuntu");
 
 let sphereMovement = new Movement(0.2, new THREE.Vector3(0.0, 0.0, 0.0));
 
+
+collisionManager.registerCollider(ball)
+
 function renderTiles() {
     let offsetx = 1.0;
     let offsety = 0.5;
@@ -140,6 +145,7 @@ function renderTiles() {
              let tile = new Tile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStarty + tileHeight / 2 + i * tileHeight, 0, generateColor())
              scene.add(tile.getObject() );
              row.push(tile)
+             collisionManager.registerCollidable(tile)
          }
          tileMatrix.push(row)
      }
@@ -361,6 +367,7 @@ function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
+
 function onMouseClick(event){
     if(event.button === 0 && gameStarted === false){
         sphereMovement.vector = new THREE.Vector3(0,1,0);
@@ -451,6 +458,7 @@ function render() {
         updatePositionMessage();
         ball.update();
         updateHelpers();
+        collisionManager.checkCollisions();
         //checkCollisions(bbSphere);
         checkTileCollision();
         //checkGameOver();

@@ -5,6 +5,7 @@ import {
     setDefaultMaterial,
     SecondaryBox,
 } from "../libs/util/util.js";
+import {GameState} from "./gameState.js";
 
 let material = setDefaultMaterial();
 
@@ -15,6 +16,13 @@ let material = setDefaultMaterial();
 class Component {
     boundingBox = null;
     object = null;
+    _id = null;
+    _surfaceNormal = null;
+    active = true;
+
+    constructor() {
+        this._id = GameState.getNextUID();
+    };
 
     getBoundingBox() {
         return this.boundingBox;
@@ -28,7 +36,25 @@ class Component {
         this.boundingBox.setFromObject(this.object);
     };
 
-    collide() {
+    collide(object) {
+        console.log(this._id + " colide com " + object.id )
+    }
+
+    get id() {
+        return this._id;
+    }
+
+    set id(value) {
+        this._id = value;
+    }
+
+
+    get surfaceNormal() {
+        return this._surfaceNormal;
+    }
+
+    set surfaceNormal(value) {
+        this._surfaceNormal = value;
     }
 
     setPosition(x, y, z){
@@ -51,23 +77,21 @@ class Wall extends Component {
         let box = new THREE.Mesh(boxGeometry, material);
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z);
+        bbBox.setFromObject(box);
 
         this.boundingBox = bbBox;
         this.object = box;
+        this.surfaceNormal = new THREE.Vector3(0, -1, 0);
     }
 
     update() {
         super.update();
     }
-
-    collide() {
-        super.collide();
-    }
 }
 
 class Tile extends Component {
 
-    _active = true;
+    active = true;
     _hits = 0;
 
     constructor(width, height, depth, x, y, z, color) {
@@ -76,17 +100,19 @@ class Tile extends Component {
         let box = new THREE.Mesh(boxGeometry, setDefaultMaterial(color));
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
+        bbBox.setFromObject(box);
 
         this.boundingBox = bbBox;
         this.object = box;
+        this.surfaceNormal = new THREE.Vector3(0, -1, 0);
     }
 
     get active() {
-        return this._active;
+        return this.active;
     }
 
     set active(value) {
-        this._active = value;
+        this.active = value;
     }
 
     get hits() {
@@ -101,8 +127,13 @@ class Tile extends Component {
         super.update();
     }
 
-    collide() {
-        super.collide();
+    collide(object) {
+        console.log(this.active)
+        if(this.active===true){
+            super.collide(object);
+            this.active = false;
+            this.object.visible = false;
+        }
     }
 }
 
@@ -134,8 +165,9 @@ class Ball extends Component {
     update() {
         super.update();
         this.moveSphere();
-        console.log("ball update " + this.movementSpeed)
-        console.log(this.movementDirection)
+        this.boundingBox.setFromObject(this.object);
+        //console.log("ball update " + this.movementSpeed)
+        //console.log(this.movementDirection)
     }
 
     moveSphere() {
@@ -157,6 +189,30 @@ class Ball extends Component {
         );
     }
 
+    collide(object) {
+        if(object.active){
+            super.collide(object);
+            this.reflect(object.surfaceNormal)
+        }
+        //object.surfaceNormal
+    }
+
+    reflect(normal) {
+        let newDirection = this.movementDirection.reflect(normal);
+        //let limit = Math.PI/2;
+        let limit = null;
+        let j = new THREE.Vector3(0, 1, 0);
+        let angleToJ = newDirection.angleTo(j);
+        let rotationAmount = angleToJ - limit +Math.PI/10;
+        let xDirection = newDirection.x < 0? -1 : 1;
+
+
+        if (limit != null && angleToJ >= limit) {
+            newDirection = newDirection.applyAxisAngle(new THREE.Vector3(0, 0, 1), xDirection* rotationAmount);
+        }
+
+        this.setMovement(newDirection, this.movementSpeed)
+    }
 
 
 }
@@ -173,14 +229,18 @@ class Base extends Component{
         this.object = base;
         this.boundingBox = bbBase;
         base.position.set(x, y, z);
+        bbBase.setFromObject(this.object)
+        this.surfaceNormal =  new THREE.Vector3(0.87, 0.5, 0);
     }
 
     update() {
         super.update();
+        this.boundingBox.setFromObject(this.object)
     }
 
     setPosition(x, y, z){
         this.object.position.set(x, y, z);
+        this.update();
     }
 
     getPosition(){
@@ -188,11 +248,6 @@ class Base extends Component{
         this.object.getWorldPosition(pos);
         return pos;
     }
-
-    collide() {
-        super.collide();
-    }
-
 }
 
 
