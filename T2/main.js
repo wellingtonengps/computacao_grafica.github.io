@@ -146,7 +146,7 @@ let mouse = new THREE.Vector2();
 var positionMessage = new SecondaryBox("");
 positionMessage.changeStyle("rgba(0,0,0,0)", "lightgray", "16px", "ubuntu");
 
-let sphereMovement = new Movement(0.2, new THREE.Vector3(0.0, 0.0, 0.0));
+let sphereMovement = new Movement(0.05, new THREE.Vector3(0.0, 0.0, 0.0));
 
 
 collisionManager.registerCollider(ball)
@@ -295,10 +295,10 @@ function resetTiles(){
 }
 
 function restartGame() {
-    base.matrixAutoUpdate = true;
-    sphereBox.matrixAutoUpdate = true;
-    base.position.set(baseStartPos.x, baseStartPos.y, baseStartPos.z);
-    sphereBox.position.set(baseStartPos.x, baseStartPos.y + baseHeight / 2 + sphereRadius, 0);
+    //base.matrixAutoUpdate = true;
+    //sphereBox.matrixAutoUpdate = true;
+    base.setPosition(baseStartPos.x, baseStartPos.y, baseStartPos.z);
+    ball.setPosition(baseStartPos.x, baseStartPos.y + baseHeight / 2 + sphereRadius, 0);
     sphereMovement.vector = new THREE.Vector3(0, 0, 0);
     countTiles = 0;
     resetTiles();
@@ -455,9 +455,8 @@ function radToDeg(rad) {
 }
 function sphereFollowBase(){
     let posVector = base.getPosition();
-    base.getObject().matrixAutoUpdate=true;
+    //base.getObject().matrixAutoUpdate=true;
     ball.setPosition(posVector.x, sphereBox.position.y, 0.0)
-
 }
 
 /*let boxGeometry = new THREE.BoxGeometry(5, 3, 3);

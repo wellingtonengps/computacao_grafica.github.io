@@ -45,6 +45,11 @@ class Component {
         let direction = object.getPosition().sub(this.getPosition()).normalize()
         raycaster.set(this.getPosition(), direction);
         let intersects = raycaster.intersectObject(object.getObject());
+
+        if(!intersects){
+            return new THREE.Vector3(0,0,0)
+        }
+
         //console.log(intersects[0])
         return intersects[0].point
     }
@@ -114,7 +119,8 @@ class Component {
 
     setPosition(x, y, z){
         this.object.position.set(x, y, z);
-        this.object.updateMatrixWorld();
+        this.update();
+        //this.object.updateMatrixWorld();
     }
 
     getPosition(){
@@ -168,12 +174,12 @@ class Tile extends Component {
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
         bbBox.setFromObject(box);
-
-
         this.boundingBox = bbBox;
         this.object = box;
         this.surfaceNormal = new THREE.Vector3(0, -1, 0);
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        this.width = width;
+        this.height = height;
     }
 
     getHelper() {
@@ -215,6 +221,19 @@ class Tile extends Component {
 
     getSurfaceNormalByPoint(point) {
         //super.getSurfaceNormalByPoint(point);
+        let relativeX = point.x - (this.getPosition().x - this.width/2)
+        let relativeY = point.y - (this.getPosition().y - this.height/2)
+
+        if(relativeX <= 0){
+            return new THREE.Vector3(-1,0,0);
+        }else if(relativeX >=this.width){
+            return new THREE.Vector3(1,0,0);
+        }else if(relativeY>=this.height){
+            return new THREE.Vector3(0,1,0);
+        }else if(relativeY<= 0){
+            return new THREE.Vector3(0,-1,0);
+        }
+
         return this.surfaceNormal;
     }
 
@@ -250,6 +269,7 @@ class Ball extends Component {
         this.movementSpeed = movementSpeed;
     }
 
+
     update() {
         super.update();
         this.moveSphere();
@@ -276,7 +296,7 @@ class Ball extends Component {
             mat4.makeTranslation(sphereX + xAmount, sphereY + yAmount, 0.0)
         );
 
-        this.object.updateMatrixWorld();
+        //this.object.updateMatrixWorld();
     }
 
     collide(object) {
@@ -285,6 +305,8 @@ class Ball extends Component {
             let rayIntersectionPoint = this.getRayIntersectionPoint(object);
             let normal = object.getSurfaceNormalByPoint(rayIntersectionPoint);
             this.reflect(normal);
+            console.log("Normal:")
+            console.log(normal)
         }
         //object.surfaceNormal
     }
@@ -325,11 +347,10 @@ class Base extends Component{
         this.surfaceNormal =  new THREE.Vector3(0, 1, 0);
     }
 
-    update() {
+    /*update() {
         super.update();
         this.boundingBox.setFromObject(this.object)
-
-    }
+    }*/
 
     setPosition(x, y, z) {
         super.setPosition(x, y, z);
