@@ -64,6 +64,7 @@ render();
 
 //-- Functions ----------------------------------------------------------------------------------------------
 
+
 function createBBHelper(bb, color)
 {
    // Create a bounding box helper

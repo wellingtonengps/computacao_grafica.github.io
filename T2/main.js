@@ -9,6 +9,9 @@ import {
 import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
+import {generateColor} from "./utils.js";
+
+
 
 // Initial variables
 let gamePaused = false;
@@ -16,7 +19,8 @@ let gameStarted = false;
 var keyboard = new KeyboardState();
 let scene = new THREE.Scene(); // Create main scene
 let renderer = initRenderer(); // Init a basic renderer
-
+let clock = new THREE.Clock()
+clock.start()
 //Camera variables
 let orthoSize = 16;
 let w = window.innerWidth;
@@ -91,22 +95,34 @@ let baseGeometry = new THREE.BoxGeometry(baseWidth, 0.5, 0.5);
 let sphereGeometry = new THREE.SphereGeometry(sphereRadius, 32, 16);
 
 //// ----------------------- ////
-let wallTop = new Wall(8, 0.5, 0.5, 4.0, 15.75, 0)
-let wallLeft = new Wall(0.5, 16, 0.5, 0.25, 8.0, 0.8);
+let wallTop = new Wall(8, 0.5, 0.5, 4.0, 15.75, 0.0)
+wallTop.surfaceNormal = new THREE.Vector3(0, -1, 0);
+let wallLeft = new Wall(0.5, 16, 0.5, 0.25, 8.0, 0.0);
+wallLeft.surfaceNormal = new THREE.Vector3(-1,0,0)
 let wallRight = new Wall(0.5, 16, 0.5, 7.75, 8.0, 0.0);
+wallRight.surfaceNormal = new THREE.Vector3(1,0,0)
+
 scene.add(wallLeft.getObject());
 scene.add(wallRight.getObject());
 scene.add(wallTop.getObject());
+scene.add(wallRight.getHelper())
+scene.add(wallLeft.getHelper())
+scene.add(wallTop.getHelper())
 
 let sphereBox = new THREE.Mesh(sphereGeometry, material);
 let base = new Base(baseHeight, baseWidth, 0.5, baseStartPos.x, baseStartPos.y, baseStartPos.z)
 scene.add(base.getObject())
 
+
+collisionManager.registerCollidable(wallLeft)
+collisionManager.registerCollidable(wallTop)
+collisionManager.registerCollidable(wallRight)
 collisionManager.registerCollidable(base)
 
-
 let ball = new Ball(sphereRadius, baseStartPos.x, baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0)
-scene.add(ball.getObject())
+ball.scene = scene;
+scene.add(ball.getObject());
+scene.add(ball.getHelper())
 ball.setMovement(new THREE.Vector3(0,0,0), 0);
 
 
@@ -135,6 +151,8 @@ let sphereMovement = new Movement(0.2, new THREE.Vector3(0.0, 0.0, 0.0));
 
 collisionManager.registerCollider(ball)
 
+
+
 function renderTiles() {
     let offsetx = 1.0;
     let offsety = 0.5;
@@ -143,7 +161,9 @@ function renderTiles() {
          let row = [];
          for (let j = 0; j < rowSize; j++) {
              let tile = new Tile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStarty + tileHeight / 2 + i * tileHeight, 0, generateColor())
+             tile.scene = scene;
              scene.add(tile.getObject() );
+             scene.add(tile.getHelper());
              row.push(tile)
              collisionManager.registerCollidable(tile)
          }
@@ -194,6 +214,7 @@ function toggleFullScreenMode(){
         document.exitFullscreen();
     }
 }
+
 
 
 function checkCollisions(object) {
@@ -261,15 +282,7 @@ function updateHelpers() {
    // bbTopBox.setFromObject(topBox)
 }
 
-function generateColor() {
-    let colorPalette = [
-        "rgb(0,255,100)",
-        "rgb(255,0,255)",
-        "rgb(255,255, 0)",
-        "rgb(255,0,0)",
-    ];
-    return colorPalette[Math.floor(Math.random() * colorPalette.length)];
-}
+
 
 function resetTiles(){
     for (let i = 0; i < numRows; i++) {
@@ -447,10 +460,29 @@ function sphereFollowBase(){
 
 }
 
+/*let boxGeometry = new THREE.BoxGeometry(5, 3, 3);
+let box = new THREE.Mesh(boxGeometry, new THREE.MeshLambertMaterial({color:"rgb(255,0,221)"}));
+box.rotateY(10)
+box.rotateZ(10)
+box.position.set(5, 5, 5)
+
+let bbBox = new THREE.Box3().setFromObject(box);
+bbBox.setFromObject(box);
+let helper = new THREE.Box3Helper(bbBox, 'white' );
+
+
+scene.add(box)
+scene.add(helper)*/
 renderTiles();
 createBackgroundPlane();
+/*
+function animate() {
+    requestAnimationFrame( animate );
+   // updatePlayer();
+    render();
+}
+*/
 render();
-
 function render() {
     keyboardUpdate();
 

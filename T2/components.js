@@ -7,6 +7,8 @@ import {
 } from "../libs/util/util.js";
 import {GameState} from "./gameState.js";
 
+
+
 let material = setDefaultMaterial();
 
 // constructor
@@ -19,6 +21,8 @@ class Component {
     _id = null;
     _surfaceNormal = null;
     active = true;
+    _scene = null;
+    _lastColided = null;
 
     constructor() {
         this._id = GameState.getNextUID();
@@ -36,8 +40,43 @@ class Component {
         this.boundingBox.setFromObject(this.object);
     };
 
+    getRayIntersectionPoint(object){
+        let raycaster = new THREE.Raycaster();
+        let direction = object.getPosition().sub(this.getPosition()).normalize()
+        raycaster.set(this.getPosition(), direction);
+        let intersects = raycaster.intersectObject(object.getObject());
+        //console.log(intersects[0])
+        return intersects[0].point
+    }
     collide(object) {
+        this.lastColided = object.id;
         console.log(this._id + " colide com " + object.id )
+        /*let raycaster = new THREE.Raycaster();
+        let direction = this.getPosition().sub(object.getPosition()).normalize()
+        raycaster.set(object.getPosition(), direction);
+        let intersects = raycaster.intersectObject(this.getObject());
+        console.log(intersects[0].point)*/
+
+        if(this.scene){
+            const material = new THREE.LineBasicMaterial({
+                color: "rgb(255,255,255)",
+                linewidth: 2
+            });
+
+            const points = [];
+            points.push(object.getPosition().add(new THREE.Vector3(0,0,2)));
+            points.push(this.getPosition().add(new THREE.Vector3(0,0,2)));
+            //points.push(new THREE.Vector3(5,5,5));
+
+            console.log(object.getPosition())
+
+            const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+            const line = new THREE.Line( geometry, material );
+            this._scene.add( line );
+            //this._scene.updateMatrixWorld()
+        }
+
     }
 
     get id() {
@@ -49,6 +88,22 @@ class Component {
     }
 
 
+    get lastColided() {
+        return this._lastColided;
+    }
+
+    set lastColided(value) {
+        this._lastColided = value;
+    }
+
+    get scene() {
+        return this._scene;
+    }
+
+    set scene(value) {
+        this._scene = value;
+    }
+
     get surfaceNormal() {
         return this._surfaceNormal;
     }
@@ -59,6 +114,7 @@ class Component {
 
     setPosition(x, y, z){
         this.object.position.set(x, y, z);
+        this.object.updateMatrixWorld();
     }
 
     getPosition(){
@@ -66,6 +122,8 @@ class Component {
         this.object.getWorldPosition(pos);
         return pos;
     }
+
+    getSurfaceNormalByPoint(point){}
 }
 
 class Wall extends Component {
@@ -75,17 +133,26 @@ class Wall extends Component {
         let material = setDefaultMaterial();
         let boxGeometry = new THREE.BoxGeometry(height, width, depth);
         let box = new THREE.Mesh(boxGeometry, material);
-        let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z);
+        let bbBox = new THREE.Box3().setFromObject(box);
         bbBox.setFromObject(box);
 
         this.boundingBox = bbBox;
         this.object = box;
         this.surfaceNormal = new THREE.Vector3(0, -1, 0);
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
     }
 
+    getHelper(){
+        return this.helper;
+    }
     update() {
         super.update();
+    }
+
+    getSurfaceNormalByPoint(point) {
+        super.getSurfaceNormalByPoint(point);
+        return this.surfaceNormal;
     }
 }
 
@@ -102,9 +169,15 @@ class Tile extends Component {
         box.position.set(x, y, z)
         bbBox.setFromObject(box);
 
+
         this.boundingBox = bbBox;
         this.object = box;
         this.surfaceNormal = new THREE.Vector3(0, -1, 0);
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+    }
+
+    getHelper() {
+        return this.helper;
     }
 
     get active() {
@@ -128,13 +201,23 @@ class Tile extends Component {
     }
 
     collide(object) {
+
+
         console.log(this.active)
         if(this.active===true){
+
+
             super.collide(object);
             this.active = false;
             this.object.visible = false;
         }
     }
+
+    getSurfaceNormalByPoint(point) {
+        //super.getSurfaceNormalByPoint(point);
+        return this.surfaceNormal;
+    }
+
 }
 
 function Movement(speed, direction) {
@@ -155,6 +238,11 @@ class Ball extends Component {
         bbSphere.setFromObject(sphereBox);
         this.boundingBox = bbSphere;
         this.object = sphereBox;
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+    }
+
+    getHelper() {
+        return this.helper;
     }
 
     setMovement(movementDir, movementSpeed) {
@@ -187,12 +275,16 @@ class Ball extends Component {
         this.object.matrix.multiply(
             mat4.makeTranslation(sphereX + xAmount, sphereY + yAmount, 0.0)
         );
+
+        this.object.updateMatrixWorld();
     }
 
     collide(object) {
-        if(object.active){
+        if(object.active && this.lastColided != object.id){
             super.collide(object);
-            this.reflect(object.surfaceNormal)
+            let rayIntersectionPoint = this.getRayIntersectionPoint(object);
+            let normal = object.getSurfaceNormalByPoint(rayIntersectionPoint);
+            this.reflect(normal);
         }
         //object.surfaceNormal
     }
@@ -230,24 +322,44 @@ class Base extends Component{
         this.boundingBox = bbBase;
         base.position.set(x, y, z);
         bbBase.setFromObject(this.object)
-        this.surfaceNormal =  new THREE.Vector3(0.87, 0.5, 0);
+        this.surfaceNormal =  new THREE.Vector3(0, 1, 0);
     }
 
     update() {
         super.update();
         this.boundingBox.setFromObject(this.object)
+
     }
 
-    setPosition(x, y, z){
-        this.object.position.set(x, y, z);
+    setPosition(x, y, z) {
+        super.setPosition(x, y, z);
         this.update();
     }
 
-    getPosition(){
+    collide(object) {
+        super.collide(object);
+    }
+
+    getSurfaceNormalByPoint(point) {
+        super.getSurfaceNormalByPoint(point);
+        let relativeX = point.x - (this.getPosition().x - this.width/2)
+        let relativeY = point.y - (this.getPosition().y - this.height/2)
+
+       // return new THREE.Vector3(0, 1, 0);
+        if(relativeX>=this.width/2){
+            return new THREE.Vector3(0.5, 0.87, 0);
+        }
+        else {
+            return new THREE.Vector3(-0.5, 0.87, 0);
+        }
+
+    }
+
+    /*getPosition(){
         let pos = new THREE.Vector3();
         this.object.getWorldPosition(pos);
         return pos;
-    }
+    }*/
 }
 
 
