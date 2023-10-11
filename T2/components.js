@@ -23,6 +23,7 @@ class Component {
     active = true;
     _scene = null;
     _lastColided = null;
+    collidedWith = []
 
     constructor() {
         this._id = GameState.getNextUID();
@@ -54,6 +55,8 @@ class Component {
         return intersects[0].point
     }
     collide(object) {
+        this.collidedWith.push(object)
+
         this.lastColided = object.id;
         console.log(this._id + " colide com " + object.id )
         /*let raycaster = new THREE.Raycaster();
@@ -272,6 +275,7 @@ class Ball extends Component {
 
     update() {
         super.update();
+        this.reactToCollisions();
         this.moveSphere();
         this.boundingBox.setFromObject(this.object);
         //console.log("ball update " + this.movementSpeed)
@@ -299,14 +303,46 @@ class Ball extends Component {
         //this.object.updateMatrixWorld();
     }
 
+    reactToCollisions(){
+
+        if(this.collidedWith.length > 0){
+            let addedNormalVectors = new THREE.Vector3(0,0,0)
+            for(let i = 0; i< this.collidedWith.length; i++){
+                let object = this.collidedWith[i]
+                let rayIntersectionPoint = this.getRayIntersectionPoint(object);
+                let normal = object.getSurfaceNormalByPoint(rayIntersectionPoint);
+                addedNormalVectors = addedNormalVectors.add(normal);
+            }
+            addedNormalVectors = addedNormalVectors.normalize();
+
+            let newDirection = this.movementDirection.reflect(addedNormalVectors);
+           /* let raycaster = new THREE.Raycaster();
+            raycaster.set(this.getPosition(), newDirection.normalize())
+
+            for(let i = 0; i< this.collidedWith.length; i++) {
+                if(raycaster.intersectObject(this.collidedWith[i].getObject())){
+                    newDirection = addedNormalVectors;
+                }
+            }*/
+
+            this.movementDirection = newDirection;
+
+            console.log("Normal:")
+            console.log(addedNormalVectors)
+
+            this.collidedWith = []
+        }
+
+    }
+
     collide(object) {
         if(object.active && this.lastColided != object.id){
             super.collide(object);
-            let rayIntersectionPoint = this.getRayIntersectionPoint(object);
-            let normal = object.getSurfaceNormalByPoint(rayIntersectionPoint);
-            this.reflect(normal);
-            console.log("Normal:")
-            console.log(normal)
+            //let rayIntersectionPoint = this.getRayIntersectionPoint(object);
+            //let normal = object.getSurfaceNormalByPoint(rayIntersectionPoint);
+           // this.reflect(normal);
+            //console.log("Normal:")
+            //console.log(normal)
         }
         //object.surfaceNormal
     }
@@ -319,7 +355,6 @@ class Ball extends Component {
         let angleToJ = newDirection.angleTo(j);
         let rotationAmount = angleToJ - limit +Math.PI/10;
         let xDirection = newDirection.x < 0? -1 : 1;
-
 
         if (limit != null && angleToJ >= limit) {
             newDirection = newDirection.applyAxisAngle(new THREE.Vector3(0, 0, 1), xDirection* rotationAmount);

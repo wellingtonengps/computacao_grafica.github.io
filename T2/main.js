@@ -274,15 +274,6 @@ function checkCollisions(object) {
 }
 
 
-function updateHelpers() {
-    //bbBase.setFromObject(base);
-   // bbSphere.setFromObject(sphereBox);
-    //bbLeftBox.setFromObject(leftBox);
-    //bbRightBox.setFromObject(rightBox);
-   // bbTopBox.setFromObject(topBox)
-}
-
-
 
 function resetTiles(){
     for (let i = 0; i < numRows; i++) {
@@ -488,11 +479,7 @@ function render() {
     if (!gamePaused) {
         updatePositionMessage();
         ball.update();
-        updateHelpers();
         collisionManager.checkCollisions();
-        //checkCollisions(bbSphere);
-        checkTileCollision();
-        //checkGameOver();
         moveBaseToRaycasterXPosition(scene, camera);
         checkWinGame();
     }
