@@ -112,6 +112,7 @@ scene.add(wallTop.getHelper())
 let sphereBox = new THREE.Mesh(sphereGeometry, material);
 let base = new Base(baseHeight, baseWidth, 0.5, baseStartPos.x, baseStartPos.y, baseStartPos.z)
 scene.add(base.getObject())
+scene.add(base.getHelper())
 
 
 collisionManager.registerCollidable(wallLeft)
@@ -212,7 +213,7 @@ function keyboardUpdate() {
 
     keyboard.update();
     if (keyboard.down("R")) {
-        //gamePaused = true;rrrrrrrrrrr
+        //gamePaused = true;
         //gameStarted = false;
         restartGame();
 
@@ -301,7 +302,7 @@ function checkCollisions(object) {
 function resetTiles(){
     for (let i = 0; i < numRows; i++) {
         for (let j = 0; j < rowSize; j++) {
-            tileMatrix[i][j].object.visible=true;
+            tileMatrix[i][j].getObject().visible=true;
             tileMatrix[i][j].active=true;
 
         }
@@ -431,7 +432,7 @@ function moveBaseToRaycasterXPosition(scene, camera) {
             //todo: tirar números mágicos
             base.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
             //ball.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
-        } else if (x >= 8 - 0.5 - 1) {
+        } else if (x >= 8 - 0.5 - baseWidth/2) {
             base.setPosition(8 - 0.5 - baseWidth/2, 2.0, 0.0)
             //base.setPosition(8 - 0.5 - baseWidth/2, 2.0, 0.0)
         }
@@ -490,8 +491,8 @@ function sphereFollowBase(){
     ball.setPosition(posVector.x, posVector.y + baseHeight/2 + sphereRadius + 0.01, 0.0)
     ball.update()
 
-    console.log(posVector)
-    console.log(ball.getPosition())
+    //console.log(posVector)
+    //console.log(ball.getPosition())
 
 
 }
@@ -530,6 +531,7 @@ function render() {
     }else {
         //updatePositionMessage();
         ball.update();
+        base.update();
         collisionManager.checkCollisions();
         moveBaseToRaycasterXPosition(scene, camera);
         checkWinGame();

@@ -380,12 +380,13 @@ class Base extends Component{
         base.position.set(x, y, z);
         bbBase.setFromObject(this.object)
         this.surfaceNormal =  new THREE.Vector3(0, 1, 0);
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
     }
 
-    /*update() {
+    update() {
         super.update();
         this.boundingBox.setFromObject(this.object)
-    }*/
+    }
 
     /*
     setPosition(x, y, z) {
@@ -395,6 +396,10 @@ class Base extends Component{
 
     collide(object) {
         super.collide(object);
+    }
+
+    getHelper(){
+        return this.helper;
     }
 
     getSurfaceNormalByPoint(point) {
