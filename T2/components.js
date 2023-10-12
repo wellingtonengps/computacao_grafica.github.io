@@ -79,31 +79,7 @@ class Component {
 
         this.lastColided = object.id;
         console.log(this._id + " colide com " + object.id )
-        /*let raycaster = new THREE.Raycaster();
-        let direction = this.getPosition().sub(object.getPosition()).normalize()
-        raycaster.set(object.getPosition(), direction);
-        let intersects = raycaster.intersectObject(this.getObject());
-        console.log(intersects[0].point)*/
 
-/*        if(this.scene){
-            const material = new THREE.LineBasicMaterial({
-                color: "rgb(255,255,255)",
-                linewidth: 2
-            });
-
-            const points = [];
-            points.push(object.getPosition().add(new THREE.Vector3(0,0,2)));
-            points.push(this.getPosition().add(new THREE.Vector3(0,0,2)));
-            //points.push(new THREE.Vector3(5,5,5));
-
-            console.log(object.getPosition())
-
-            const geometry = new THREE.BufferGeometry().setFromPoints( points );
-
-            const line = new THREE.Line( geometry, material );
-            this._scene.add( line );
-            //this._scene.updateMatrixWorld()
-        }*/
 
     }
 
@@ -190,6 +166,7 @@ class Tile extends Component {
 
     active = true;
     _hits = 0;
+    _onCollide = null;
 
     constructor(width, height, depth, x, y, z, color) {
         super();
@@ -230,16 +207,21 @@ class Tile extends Component {
         super.update();
     }
 
+    setOnCollide(func){
+        this._onCollide  = func;
+    }
+
     collide(object) {
-
-
         console.log(this.active)
         if(this.active===true){
-
-
             super.collide(object);
             this.active = false;
             this.object.visible = false;
+            this.hits++;
+
+            if(this._onCollide != null){
+                this._onCollide()
+            }
         }
     }
 
