@@ -47,24 +47,6 @@ class Component {
         raycaster.set(this.getPosition(), direction);
         let intersects = raycaster.intersectObject(object.getObject());
 
-        if(!intersects){
-            return new THREE.Vector3(0,0,0)
-        }
-
-        //console.log(intersects[0])
-        return intersects[0].point
-    }
-    collide(object) {
-        this.collidedWith.push(object)
-
-        this.lastColided = object.id;
-        console.log(this._id + " colide com " + object.id )
-        /*let raycaster = new THREE.Raycaster();
-        let direction = this.getPosition().sub(object.getPosition()).normalize()
-        raycaster.set(object.getPosition(), direction);
-        let intersects = raycaster.intersectObject(this.getObject());
-        console.log(intersects[0].point)*/
-
         if(this.scene){
             const material = new THREE.LineBasicMaterial({
                 color: "rgb(255,255,255)",
@@ -84,6 +66,44 @@ class Component {
             this._scene.add( line );
             //this._scene.updateMatrixWorld()
         }
+
+        if(intersects.length == 0){
+            return new THREE.Vector3(0,0,0)
+        }
+
+        //console.log(intersects[0])
+        return intersects[0].point
+    }
+    collide(object) {
+        this.collidedWith.push(object)
+
+        this.lastColided = object.id;
+        console.log(this._id + " colide com " + object.id )
+        /*let raycaster = new THREE.Raycaster();
+        let direction = this.getPosition().sub(object.getPosition()).normalize()
+        raycaster.set(object.getPosition(), direction);
+        let intersects = raycaster.intersectObject(this.getObject());
+        console.log(intersects[0].point)*/
+
+/*        if(this.scene){
+            const material = new THREE.LineBasicMaterial({
+                color: "rgb(255,255,255)",
+                linewidth: 2
+            });
+
+            const points = [];
+            points.push(object.getPosition().add(new THREE.Vector3(0,0,2)));
+            points.push(this.getPosition().add(new THREE.Vector3(0,0,2)));
+            //points.push(new THREE.Vector3(5,5,5));
+
+            console.log(object.getPosition())
+
+            const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+            const line = new THREE.Line( geometry, material );
+            this._scene.add( line );
+            //this._scene.updateMatrixWorld()
+        }*/
 
     }
 
@@ -225,8 +245,9 @@ class Tile extends Component {
 
     getSurfaceNormalByPoint(point) {
         //super.getSurfaceNormalByPoint(point);
-        let relativeX = point.x - (this.getPosition().x - this.width/2)
-        let relativeY = point.y - (this.getPosition().y - this.height/2)
+        let relativeX = point.x - this.getPosition().x + this.width/2;
+        let relativeY = point.y - this.getPosition().y + this.height/2;
+        console.log(relativeX)
 
         if(relativeX <= 0){
             return new THREE.Vector3(-1,0,0);
@@ -303,6 +324,17 @@ class Ball extends Component {
 
         //this.object.updateMatrixWorld();
     }
+
+   /* getRayIntersectionPoint(object) {
+        //return super.getRayIntersectionPoint(object);
+
+        let raycaster = new THREE.Raycaster();
+        let direction = this.movementDirection.normalize()
+        raycaster.set(this.getPosition(), direction);
+        let intersects = raycaster.intersectObject(object.getObject());
+
+        return intersects[0].point
+    }*/
 
     reactToCollisions(){
 
@@ -404,8 +436,8 @@ class Base extends Component{
 
     getSurfaceNormalByPoint(point) {
         super.getSurfaceNormalByPoint(point);
-        let relativeX = point.x - (this.getPosition().x - this.width/2)
-        let relativeY = point.y - (this.getPosition().y - this.height/2)
+        let relativeX = point.x - this.getPosition().x + this.width/2
+        let relativeY = point.y - this.getPosition().y + this.height/2
 
        // return new THREE.Vector3(0, 1, 0);
         if(relativeX>=this.width/2){

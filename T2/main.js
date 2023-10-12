@@ -318,7 +318,8 @@ function restartGame() {
     //base.setPosition(0, 0, 0);
     base.setPosition(baseStartPos.x, baseStartPos.y, baseStartPos.z);
     ball.setPosition(baseStartPos.x, baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
-    sphereMovement.vector = new THREE.Vector3(0, 0, 0);
+    //ball.movementDirection = new THREE.Vector3(0, 0, 0);
+    ball.movementSpeed = 0;
     countTiles = 0;
     resetTiles();
     //updateHelpers();
@@ -526,14 +527,17 @@ function render() {
     keyboardUpdate();
 
 
-    if(gamePaused){
-
-    }else {
-        //updatePositionMessage();
+    if(!gameStarted){
+        moveBaseToRaycasterXPosition(scene, camera);
+        sphereFollowBase();
         ball.update();
         base.update();
-        collisionManager.checkCollisions();
+    }else if(!gamePaused){
+        //updatePositionMessage();
+        ball.update();
         moveBaseToRaycasterXPosition(scene, camera);
+        base.update();
+        collisionManager.checkCollisions();
         checkWinGame();
     }
 
@@ -547,11 +551,7 @@ function render() {
         checkWinGame();
     }*/
 
-    if(!gameStarted){
 
-        moveBaseToRaycasterXPosition(scene, camera);
-        sphereFollowBase();
-    }
 
     requestAnimationFrame(render);
     renderer.render(scene, camera); // Render scene
