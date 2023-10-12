@@ -121,8 +121,9 @@ class Component {
     }
 
     setPosition(x, y, z){
+        this.object.matrixAutoUpdate = true;
         this.object.position.set(x, y, z);
-        this.update();
+        //this.update();
         //this.object.updateMatrixWorld();
     }
 
@@ -363,7 +364,6 @@ class Ball extends Component {
         this.setMovement(newDirection, this.movementSpeed)
     }
 
-
 }
 
 class Base extends Component{
@@ -387,10 +387,11 @@ class Base extends Component{
         this.boundingBox.setFromObject(this.object)
     }*/
 
+    /*
     setPosition(x, y, z) {
         super.setPosition(x, y, z);
         this.update();
-    }
+    }*/
 
     collide(object) {
         super.collide(object);

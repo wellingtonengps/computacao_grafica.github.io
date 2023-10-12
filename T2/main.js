@@ -188,6 +188,7 @@ function createTile(x, y, z, color) {
     return tile;
 }
 
+/*
 function keyboardUpdate() {
 
     keyboard.update();
@@ -205,7 +206,29 @@ function keyboardUpdate() {
         toggleFullScreenMode();
     }
 
+}*/
+
+function keyboardUpdate() {
+
+    keyboard.update();
+    if (keyboard.down("R")) {
+        //gamePaused = true;rrrrrrrrrrr
+        //gameStarted = false;
+        restartGame();
+
+    } else if (keyboard.down("space")) {
+        pauseGame(!gamePaused);
+/*
+        if(gameStarted){
+            gamePaused = !gamePaused;
+        }
+*/
+    } else if (keyboard.down("enter")){
+        toggleFullScreenMode();
+    }
+
 }
+
 
 function toggleFullScreenMode(){
     if (!document.fullscreenElement) {
@@ -286,14 +309,27 @@ function resetTiles(){
 }
 
 function restartGame() {
+
+    //pauseGame(!gamePaused);
+    startGame(false);
     //base.matrixAutoUpdate = true;
     //sphereBox.matrixAutoUpdate = true;
+    //base.setPosition(0, 0, 0);
     base.setPosition(baseStartPos.x, baseStartPos.y, baseStartPos.z);
-    ball.setPosition(baseStartPos.x, baseStartPos.y + baseHeight / 2 + sphereRadius, 0);
+    ball.setPosition(baseStartPos.x, baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
     sphereMovement.vector = new THREE.Vector3(0, 0, 0);
     countTiles = 0;
     resetTiles();
     //updateHelpers();
+}
+
+
+function pauseGame(status){
+    gamePaused = status;
+}
+
+function startGame(status) {
+    gameStarted = status;
 }
 
 
@@ -374,8 +410,7 @@ function onMouseMove(event) {
 
 function onMouseClick(event){
     if(event.button === 0 && gameStarted === false){
-        sphereMovement.vector = new THREE.Vector3(0,1,0);
-        ball.setMovement(sphereMovement.vector, sphereMovement.speed)
+        ball.setMovement(new THREE.Vector3(0,1,0), 0.2)
         gameStarted = true;
     }
 }
@@ -391,11 +426,14 @@ function moveBaseToRaycasterXPosition(scene, camera) {
     if (intersects.length > 0) {
         let x = intersects[0].point.x;
         base.setPosition(x, 2.0, 0.0)
+        //ball.setPosition(x, 2.0, 0.0)
         if (x <= 0.50 + baseWidth/2) {
             //todo: tirar números mágicos
             base.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
+            //ball.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
         } else if (x >= 8 - 0.5 - 1) {
             base.setPosition(8 - 0.5 - baseWidth/2, 2.0, 0.0)
+            //base.setPosition(8 - 0.5 - baseWidth/2, 2.0, 0.0)
         }
 
     }
@@ -447,7 +485,15 @@ function radToDeg(rad) {
 function sphereFollowBase(){
     let posVector = base.getPosition();
     //base.getObject().matrixAutoUpdate=true;
-    ball.setPosition(posVector.x, sphereBox.position.y, 0.0)
+
+
+    ball.setPosition(posVector.x, posVector.y + baseHeight/2 + sphereRadius + 0.01, 0.0)
+    ball.update()
+
+    console.log(posVector)
+    console.log(ball.getPosition())
+
+
 }
 
 /*let boxGeometry = new THREE.BoxGeometry(5, 3, 3);
@@ -473,20 +519,36 @@ function animate() {
 }
 */
 render();
+
+
 function render() {
     keyboardUpdate();
 
-    if (!gamePaused) {
-        updatePositionMessage();
+
+    if(gamePaused){
+
+    }else {
+        //updatePositionMessage();
         ball.update();
         collisionManager.checkCollisions();
         moveBaseToRaycasterXPosition(scene, camera);
         checkWinGame();
     }
 
-    if(!gameStarted){
-        sphereFollowBase();
+
+    /*
+    if (!gamePaused) {
+        updatePositionMessage();
+        ball.update();
+        collisionManager.checkCollisions();
         moveBaseToRaycasterXPosition(scene, camera);
+        checkWinGame();
+    }*/
+
+    if(!gameStarted){
+
+        moveBaseToRaycasterXPosition(scene, camera);
+        sphereFollowBase();
     }
 
     requestAnimationFrame(render);
