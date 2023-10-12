@@ -141,6 +141,7 @@ function resetTiles(){
     }
 }
 
+
 function restartGame() {
 
     startGame(false);
