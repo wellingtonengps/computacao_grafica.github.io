@@ -349,7 +349,7 @@ class Ball extends Component {
             addedNormalVectors = addedNormalVectors.normalize();
 
             let newDirection = this.movementDirection.reflect(addedNormalVectors);
-           /* let raycaster = new THREE.Raycaster();
+            /*let raycaster = new THREE.Raycaster();
             raycaster.set(this.getPosition(), newDirection.normalize())
 
             for(let i = 0; i< this.collidedWith.length; i++) {
@@ -438,6 +438,9 @@ class Base extends Component{
         super.getSurfaceNormalByPoint(point);
         let relativeX = point.x - this.getPosition().x + this.width/2
         let relativeY = point.y - this.getPosition().y + this.height/2
+
+        let normal = point.sub(this.getPosition()).multiplyScalar(-1).normalize()
+        return normal;
 
        // return new THREE.Vector3(0, 1, 0);
         if(relativeX>=this.width/2){
