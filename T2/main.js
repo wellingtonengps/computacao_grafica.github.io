@@ -145,11 +145,7 @@ function resetTiles(){
 function restartGame() {
 
     startGame(false);
-    base.setPosition(baseStartPos.x, baseStartPos.y, baseStartPos.z);
-    ball.setPosition(baseStartPos.x, baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
-    ball.movementSpeed = 0;
-    countTiles = 0;
-    resetTiles();
+    level.restartLevel();
 }
 
 function pauseGame(status){

@@ -264,6 +264,7 @@ class Ball extends Component {
         bbSphere.setFromObject(sphereBox);
         this.boundingBox = bbSphere;
         this.object = sphereBox;
+        this.radius = radius;
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
     }
 
