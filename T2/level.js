@@ -230,29 +230,47 @@ class Level1 extends Level{}
 
 class Level2 extends Level{
     initCamera(){
-        //Camera variables
         let orthoSize = 16;
         let w = window.innerWidth;
         let h = window.innerHeight
-        let aspect = w/h;
-        let near = 0.1;
-        let far = 1000;
 
-        let camera = new THREE.OrthographicCamera(-orthoSize * aspect / 2, orthoSize * aspect / 2, // left, right
-            orthoSize / 2, -orthoSize / 2,                  // top, bottom
-            near, far);
+        let aspect = 16/8;
+        let fov = 90;
+
+        let camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100);
+
+
         camera.position.set(4, 8, 8.25)
         this._camera = camera;
-        //this.controller = new Controller(camera);
-        //this.controller.registerListeners();
 
-        // Create a basic light to illuminate the scene
         camera.lookAt(4, 8, 0);
         camera.updateProjectionMatrix();
     }
 
     initLight(){
-        let light = initDefaultBasicLight(this.scene);
+        //let light = initDefaultBasicLight(this.scene);
+        let ambientColor = "rgb(80,80,80)"
+        let ambientLight = new THREE.AmbientLight(ambientColor);
+        this.scene.add(ambientLight);
+
+
+        let position = new THREE.Vector3(10.0, 0, 34);
+        let position2 = new THREE.Vector3(0, 0, 0);
+        let lightColor = "rgb(255, 255, 255)";
+        let dirLight = new THREE.DirectionalLight(lightColor, 0.6);
+            dirLight.target.position.copy(position2);
+            dirLight.position.copy(position);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 512;
+            dirLight.shadow.mapSize.height = 512;
+            dirLight.shadow.camera.near = 1;
+            dirLight.shadow.camera.far = 40;
+            dirLight.shadow.camera.left = -20;
+            dirLight.shadow.camera.right = 20;
+            dirLight.shadow.camera.top = 20;
+            dirLight.shadow.camera.bottom = -20;
+
+            this.scene.add(dirLight);
     }
 
 
@@ -361,8 +379,9 @@ class Level2 extends Level{
         planeMaterial.opacity = 1.0;
 
         let backgroundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-        backgroundPlane.position.set(4, 8, 0);
+        backgroundPlane.position.set(4, 8, -1);
         this.backgroundPlane = backgroundPlane;
+        backgroundPlane.receiveShadow = true;
         scene.add(backgroundPlane)
 
         return backgroundPlane;

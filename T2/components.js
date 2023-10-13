@@ -147,6 +147,8 @@ class Wall extends Component {
         this.object = box;
         this.surfaceNormal = new THREE.Vector3(0, -1, 0);
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+
+        box.castShadow = true;
     }
 
     getHelper(){
@@ -181,6 +183,7 @@ class Tile extends Component {
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
         this.width = width;
         this.height = height;
+        box.castShadow = true;
     }
 
     getHelper() {
@@ -266,6 +269,7 @@ class Ball extends Component {
         this.object = sphereBox;
         this.radius = radius;
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        sphereBox.castShadow = true;
     }
 
     getHelper() {
@@ -396,6 +400,8 @@ class Base extends Component{
         bbBase.setFromObject(this.object)
         this.surfaceNormal =  new THREE.Vector3(0, 1, 0);
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+
+        base.castShadow = true
     }
 
     update() {

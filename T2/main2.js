@@ -8,7 +8,7 @@ import {
 } from "../libs/util/util.js";
 import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile} from "./components.js";
-import {Level} from "./level.js";
+import {Level, Level2} from "./level.js";
 import {CollisionManager} from "./collisionManager.js";
 import {generateColor} from "./utils.js";
 
@@ -18,6 +18,9 @@ let gameStarted = false;
 var keyboard = new KeyboardState();
 let scene; // Create main scene
 let renderer = initRenderer(); // Init a basic renderer
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+
 let level;
 let mouse = new THREE.Vector2();
 let levelNumber= 1;
@@ -126,7 +129,7 @@ function initLevel(levelNumber) {
     scene = new THREE.Scene();
 
     if(levelNumber === 1){
-        level = new Level(scene);
+        level = new Level2(scene);
     }
 
     level.initTileMatrix(scene);
