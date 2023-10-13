@@ -10,6 +10,7 @@ import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
 import {generateColor} from "./utils.js";
+import {CSG} from "../libs/other/CSGMesh.js";
 //import scene from "../build/jsm/offscreen/scene";
 
 class Level{
@@ -367,6 +368,8 @@ class Level2 extends Level{
         this.collisionManager.registerCollidable(base)
         this.collisionManager.registerCollider(ball)
 
+        this.createObjectTest(this.scene)
+
     }
 
     createBackgroundPlane(scene) {
@@ -418,7 +421,34 @@ class Level2 extends Level{
 
     }
 
+    createObjectTest(scene){
+        let mat = new THREE.MeshPhongMaterial({color: 'red', shininess:500});
+        let cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1))
+        let cylinderMesh = new THREE.Mesh( new THREE.CylinderGeometry(0.5, 0.5, 1, 20))
 
+        cubeMesh.position.set(5, 1.5, 2)
+        cubeMesh.matrixAutoUpdate = false;
+        cubeMesh.updateMatrix();
+
+        cylinderMesh.position.set(5, 2, 2)
+        cylinderMesh.rotateX(Math.PI/2)
+        cylinderMesh.matrixAutoUpdate = false;
+        cylinderMesh.updateMatrix();
+
+        let outerCyCSG = CSG.fromMesh(cylinderMesh)
+        let cubeCSG = CSG.fromMesh(cubeMesh);
+
+        let csgBase = outerCyCSG.subtract(cubeCSG)
+
+        let base = CSG.toMesh(csgBase, new THREE.Matrix4())
+        base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess:500})
+        base.position.set(1, 4, 0)
+        //this.base.object = base;
+
+        scene.add(base)
+
+        return base;
+    }
     get countTiles() {
         return this._countTiles;
     }
