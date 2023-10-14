@@ -132,7 +132,17 @@ function initLevel(levelNumber) {
         level = new Level2(scene);
     }
 
-    level.initTileMatrix(scene);
+
+    const matrix = [
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 0, 0, 0, 0, 0],
+        [1, 1, 1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 1, 0, 0]
+    ];
+
+
+    level.initTileMatrix(matrix);
     level.initGameScene(scene);
     level.createObjects(scene);
     level.createBackgroundPlane(scene);

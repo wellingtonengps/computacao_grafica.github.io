@@ -9,3 +9,16 @@ function generateColor() {
 }
 
 export {generateColor}
+
+function getColumnsRows(matrix) {
+    const numRows = matrix.length;
+
+    if (numRows === 0) {
+        return { row: 0, columns: 0 };
+    }
+
+    const numCols = matrix[0].length;
+
+    return { row: numRows, columns: numCols };
+}
+

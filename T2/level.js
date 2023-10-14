@@ -255,16 +255,16 @@ class Level2 extends Level{
         this.scene.add(ambientLight);
 
 
-        let position = new THREE.Vector3(10.0, 0, 34);
+        let position = new THREE.Vector3(2, 12, 12);
         let position2 = new THREE.Vector3(0, 0, 0);
         let lightColor = "rgb(255, 255, 255)";
-        let dirLight = new THREE.DirectionalLight(lightColor, 0.6);
+        let dirLight = new THREE.DirectionalLight(lightColor, 0.7);
             dirLight.target.position.copy(position2);
             dirLight.position.copy(position);
             dirLight.castShadow = true;
-            dirLight.shadow.mapSize.width = 512;
-            dirLight.shadow.mapSize.height = 512;
-            dirLight.shadow.camera.near = 1;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
+            dirLight.shadow.camera.near = .0;
             dirLight.shadow.camera.far = 40;
             dirLight.shadow.camera.left = -20;
             dirLight.shadow.camera.right = 20;
@@ -283,6 +283,7 @@ class Level2 extends Level{
         this._camera = value;
     }
 
+    /*
     resetTiles(){
         for (let i = 0; i < this.numRows; i++) {
             for (let j = 0; j < this.rowSize; j++) {
@@ -290,12 +291,25 @@ class Level2 extends Level{
                 this.tileMatrix[i][j].active=true;
             }
         }
-    }
+    }*/
+
+
+   resetTiles(){
+       for (let i = 0; i < this.numRows; i++) {
+           for (let j = 0; j < this.rowSize; j++) {
+               if(this.tileMatrix[i][j] !== null){
+                   this.tileMatrix[i][j].getObject().visible=true;
+                   this.tileMatrix[i][j].active=true;
+               }
+           }
+       }
+   }
 
     incrementCollisionCount(){
         this._countTiles++;
     }
 
+    /*
     renderTiles(numRows, rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY) {
         //let offsetx = 1.0;
         //let offsety = 0.5;
@@ -313,21 +327,58 @@ class Level2 extends Level{
             }
             this.tileMatrix.push(row)
         }
+    }*/
+
+    renderTiles(numRows, rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix) {
+        //let offsetx = 1.0;
+        //let offsety = 0.5;
+
+        for (let i = 0; i < numRows; i++) {
+            let row = [];
+            for (let j = 0; j < rowSize; j++) {
+                if(matrix[i][j] === 1) {
+                    //todo: mudei aqui para inverter
+                    let tile = new Tile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStartY + tileHeight / 2 - i * tileHeight, 0, generateColor())
+                    tile.setOnCollide(this.incrementCollisionCount)
+                    tile.scene = this.scene;
+                    //scene.add(tile.getHelper());
+                    row.push(tile);
+                    this.collisionManager.registerCollidable(tile);
+                }else {
+                    row.push(null);
+                }
+            }
+            this.tileMatrix.push(row)
+        }
+
+
+
+        for (let i = numRows - 1; i >= 0; i--) {
+            for (let j = rowSize - 1; j >= 0; j--) {
+                if (this.tileMatrix[i][j] !== null) {
+                    this.scene.add(this.tileMatrix[i][j].getObject());
+                }
+            }
+        }
+
+
     }
 
     getTotalTiles(){
         return this.rowSize * this.numRows;
     }
 
-    initTileMatrix(){
+    initTileMatrix(matrix){
         // variables for create tile matrix;
         let tileWallStartX = 0.5;
-        let tileWallStartY = 12;
+        //todo: mudei aqui
+        //let tileWallStartY = 12;
+        let tileWallStartY = 14;
         let tileWidth = 1.0;
         let tileHeight = 0.5;
 
-        this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, this.scene);
-        this.resetTiles(this.numRows, this.rowSize);
+        this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
+        this.resetTiles(this.numRows, this.rowSize, matrix);
     }
 
     initGameScene(){
@@ -382,7 +433,7 @@ class Level2 extends Level{
         planeMaterial.opacity = 1.0;
 
         let backgroundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-        backgroundPlane.position.set(4, 8, -1);
+        backgroundPlane.position.set(4, 8, -0.5);
         this.backgroundPlane = backgroundPlane;
         backgroundPlane.receiveShadow = true;
         scene.add(backgroundPlane)
