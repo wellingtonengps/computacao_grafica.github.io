@@ -10,7 +10,7 @@ import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile} from "./components.js";
 import {Level, Level2} from "./level.js";
 import {CollisionManager} from "./collisionManager.js";
-import {generateColor} from "./utils.js";
+import {generateColor, lerArquivoJSON, obterMatrizPeloNivel} from "./utils.js";
 
 // Initial variables
 let gamePaused = false;
@@ -133,16 +133,29 @@ function initLevel(levelNumber) {
     }
 
 
+    /*
     const matrix = [
         [1, 0, 0, 0, 0, 0, 1],
         [1, 1, 0, 0, 0, 0, 0],
         [1, 1, 1, 0, 0, 0, 0],
         [1, 1, 1, 1, 0, 0, 0],
-        [1, 1, 1, 1, 1, 0, 0]
-    ];
+        [1, 1, 1, 1, 1, 1, 1]
+    ];*/
+
+    //let matrix = obterMatrizPeloNivel(0)
 
 
-    level.initTileMatrix(matrix);
+    lerArquivoJSON("matrixLevel.json", 2, (data) => {
+        let matrix = [];
+        matrix = data;
+        level.initTileMatrix(matrix);
+    })
+
+
+
+
+
+
     level.initGameScene(scene);
     level.createObjects(scene);
     level.createBackgroundPlane(scene);

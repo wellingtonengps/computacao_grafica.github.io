@@ -8,7 +8,7 @@ function generateColor() {
     return colorPalette[Math.floor(Math.random() * colorPalette.length)];
 }
 
-export {generateColor}
+
 
 function getColumnsRows(matrix) {
     const numRows = matrix.length;
@@ -22,3 +22,31 @@ function getColumnsRows(matrix) {
     return { row: numRows, columns: numCols };
 }
 
+function lerArquivoJSON(caminho, nivel, callback) {
+    fetch(caminho)
+        .then(response => response.json())
+        .then(data => {
+            callback(data[nivel - 1].matrix);
+        })
+        .catch(error => {
+            console.error('Ocorreu um erro:', error);
+        });
+}
+
+// Exemplo de uso:
+
+
+
+function obterMatrizPeloNivel(nivelDesejado) {
+
+    let jsonData = [];
+
+    lerArquivoJSON('matrixLevel.json', (data) => {
+        jsonData = data;
+        console.log(j);
+    });
+
+    callback(jsonData);
+}
+
+export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON}
