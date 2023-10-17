@@ -53,6 +53,7 @@ class Component {
                 linewidth: 2
             });
 
+
             const points = [];
             points.push(object.getPosition().add(new THREE.Vector3(0,0,2)));
             points.push(this.getPosition().add(new THREE.Vector3(0,0,2)));
@@ -170,7 +171,7 @@ class Tile extends Component {
     _hits = 0;
     _onCollide = null;
 
-    constructor(width, height, depth, x, y, z, color) {
+    constructor(width, height, depth, x, y, z, color, maxHits=1) {
         super();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
         let box = new THREE.Mesh(boxGeometry, setDefaultMaterial(color));
@@ -184,6 +185,7 @@ class Tile extends Component {
         this.width = width;
         this.height = height;
         box.castShadow = true;
+        this.maxHits = maxHits;
     }
 
     getHelper() {
@@ -217,10 +219,18 @@ class Tile extends Component {
     collide(object) {
         console.log(this.active)
         if(this.active===true){
+
             super.collide(object);
-            this.active = false;
-            this.object.visible = false;
             this.hits++;
+
+            if(this.hits ==this.maxHits){
+                this.active = false;
+                this.object.visible = false;
+            }
+            else{
+                this.getObject().material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+            }
+
 
             if(this._onCollide != null){
                 this._onCollide()
@@ -448,5 +458,25 @@ class Base extends Component{
     }*/
 }
 
+class PowerUpTile extends Tile{
 
-export {Ball, Wall, Tile, Base}
+    constructor(width, height, depth, x, y, z, color, maxHits=1) {
+        super();
+        let boxGeometry = new THREE.BoxGeometry(width, height, depth);
+        let material = new THREE.MeshLambertMaterial({color: "rgb(0,0,0)"})
+        let box = new THREE.Mesh(boxGeometry, material);
+        let bbBox = new THREE.Box3().setFromObject(box);
+        box.position.set(x, y, z)
+        bbBox.setFromObject(box);
+        this.boundingBox = bbBox;
+        this.object = box;
+        this.surfaceNormal = new THREE.Vector3(0, -1, 0);
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        this.width = width;
+        this.height = height;
+        box.castShadow = true;
+        this.maxHits = maxHits;
+    }
+
+}
+export {Ball, Wall, Tile, Base, PowerUpTile}

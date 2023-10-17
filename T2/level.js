@@ -7,9 +7,9 @@ import {
     SecondaryBox,
 } from "../libs/util/util.js";
 import KeyboardState from "../libs/util/KeyboardState.js";
-import {Ball, Base, Wall, Tile} from "./components.js";
+import {Ball, Base, Wall, Tile, PowerUpTile} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
-import {generateColor} from "./utils.js";
+import {generateColor, getColumns, getColumnsRows, getRows} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 //import scene from "../build/jsm/offscreen/scene";
 
@@ -294,9 +294,9 @@ class Level2 extends Level{
     }*/
 
 
-   resetTiles(){
-       for (let i = 0; i < this.numRows; i++) {
-           for (let j = 0; j < this.rowSize; j++) {
+   resetTiles(numRows, rowSize){
+       for (let i = 0; i < numRows; i++) {
+           for (let j = 0; j < rowSize; j++) {
                if(this.tileMatrix[i][j] !== null){
                    this.tileMatrix[i][j].getObject().visible=true;
                    this.tileMatrix[i][j].active=true;
@@ -333,19 +333,27 @@ class Level2 extends Level{
         //let offsetx = 1.0;
         //let offsety = 0.5;
 
+
         for (let i = 0; i < numRows; i++) {
             let row = [];
             for (let j = 0; j < rowSize; j++) {
-                if(matrix[i][j] === 1) {
+                if(matrix[i][j] >= 1) {
                     //todo: mudei aqui para inverter
-                    let tile = new Tile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStartY + tileHeight / 2 - i * tileHeight, 0, generateColor())
+                    let tile = new Tile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStartY + tileHeight / 2 - i * tileHeight, 0, generateColor(), matrix[i][j])
                     tile.setOnCollide(this.incrementCollisionCount)
                     tile.scene = this.scene;
                     //scene.add(tile.getHelper());
                     row.push(tile);
                     this.collisionManager.registerCollidable(tile);
-                }else {
+                }else if(matrix[i][j] === 0){
                     row.push(null);
+                }else if(matrix[i][j] === -1){
+                    let tile = new PowerUpTile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStartY + tileHeight / 2 - i * tileHeight, 0, generateColor(), 1)
+                    tile.setOnCollide(this.incrementCollisionCount)
+                    tile.scene = this.scene;
+                    //scene.add(tile.getHelper());
+                    row.push(tile);
+                    this.collisionManager.registerCollidable(tile);
                 }
             }
             this.tileMatrix.push(row)
@@ -374,11 +382,13 @@ class Level2 extends Level{
         //todo: mudei aqui
         //let tileWallStartY = 12;
         let tileWallStartY = 14;
-        let tileWidth = 1.0;
-        let tileHeight = 0.5;
+        let tileWidth = 0.75;
+        let tileHeight = 0.25;
+        let rowSize = getColumns(matrix);
+        let numRows = getRows(matrix);
 
-        this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
-        this.resetTiles(this.numRows, this.rowSize, matrix);
+        this.renderTiles(numRows, rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
+        this.resetTiles(numRows, rowSize);
     }
 
     initGameScene(){
@@ -387,9 +397,9 @@ class Level2 extends Level{
         let baseHeight = 0.5;
         let baseWidth = 1.0;
 
-        let wallTop = new Wall(8, 0.5, 0.5, 4.0, 15.75, 0.0);
+        let wallTop = new Wall(9.25, 0.5, 0.5, 4.625, 15.75, 0.0);
         let wallLeft = new Wall(0.5, 16, 0.5, 0.25, 8.0, 0.0);
-        let wallRight = new Wall(0.5, 16, 0.5, 7.75, 8.0, 0.0);
+        let wallRight = new Wall(0.5, 16, 0.5, 9.00, 8.0, 0.0);
         let base = new Base(baseHeight, baseWidth, 0.5, this.baseStartPos.x, this.baseStartPos.y, this.baseStartPos.z)
         let ball = new Ball(sphereRadius, this.baseStartPos.x, this.baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
 
@@ -424,7 +434,7 @@ class Level2 extends Level{
     }
 
     createBackgroundPlane(scene) {
-        let planeGeometry = new THREE.PlaneGeometry(8, 16, 20, 20);
+        let planeGeometry = new THREE.PlaneGeometry(9.25, 16.00, 20, 20);
         let planeMaterial = new THREE.MeshLambertMaterial({
             color: "rgb(0,255,255)",
         });
@@ -433,7 +443,7 @@ class Level2 extends Level{
         planeMaterial.opacity = 1.0;
 
         let backgroundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-        backgroundPlane.position.set(4, 8, -0.5);
+        backgroundPlane.position.set(4.625, 8, -0.5);
         this.backgroundPlane = backgroundPlane;
         backgroundPlane.receiveShadow = true;
         scene.add(backgroundPlane)
@@ -517,6 +527,8 @@ class Level2 extends Level{
     }
 
 }
+
+
 
 class Controller{
     mouse;

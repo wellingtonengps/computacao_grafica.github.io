@@ -22,6 +22,14 @@ function getColumnsRows(matrix) {
     return { row: numRows, columns: numCols };
 }
 
+function getColumns(matrix){
+    return matrix[0].length;
+}
+
+function getRows(matrix){
+    return matrix.length;
+}
+
 function lerArquivoJSON(caminho, nivel, callback) {
     fetch(caminho)
         .then(response => response.json())
@@ -49,4 +57,4 @@ function obterMatrizPeloNivel(nivelDesejado) {
     callback(jsonData);
 }
 
-export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON}
+export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON, getColumns, getRows}

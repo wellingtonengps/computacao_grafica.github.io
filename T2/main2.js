@@ -112,8 +112,8 @@ function moveBaseToRaycasterXPosition() {
             //todo: tirar números mágicos
             base.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
             //ball.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
-        } else if (x >= 8 - 0.5 - baseWidth/2) {
-            base.setPosition(8 - 0.5 - baseWidth/2, 2.0, 0.0)
+        } else if (x >= 9.25 - 0.5 - baseWidth/2) {
+            base.setPosition(9.25 - 0.5 - baseWidth/2, 2.0, 0.0)
         }
     }
 }
