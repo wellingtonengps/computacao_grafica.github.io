@@ -469,7 +469,7 @@ class Base extends Component{
         let relativeX = point.x - this.getPosition().x + this.width/2
         let relativeY = point.y - this.getPosition().y + this.height/2
 
-        let normal = point.sub(this.getPosition().sub(new THREE.Vector3(0, 2, 0))).multiplyScalar(-1).normalize()
+        let normal = point.sub(this.getPosition().sub(new THREE.Vector3(0, 1, 0))).multiplyScalar(-1).normalize()
         return normal;
 
        // return new THREE.Vector3(0, 1, 0);
