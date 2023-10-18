@@ -395,7 +395,7 @@ class Level2 extends Level{
         let sphereRadius = 0.2;
         this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
         let baseHeight = 0.5;
-        let baseWidth = 1.0;
+        let baseWidth = 2.0;
 
         let wallTop = new Wall(9.25, 0.5, 0.5, 4.625, 15.75, 0.0);
         let wallLeft = new Wall(0.5, 16, 0.5, 0.25, 8.0, 0.0);
@@ -418,6 +418,7 @@ class Level2 extends Level{
         this.scene.add(base.getObject());
         ball.scene = this.scene;
         this.scene.add(ball.getObject());
+        this.scene.add(base.getHelper())
 
         // movimento inicial
         ball.setMovement(new THREE.Vector3(0,0,0), 0);
@@ -429,7 +430,7 @@ class Level2 extends Level{
         this.collisionManager.registerCollidable(base)
         this.collisionManager.registerCollider(ball)
 
-        this.createObjectTest(this.scene)
+        this.createCSGBase(this.scene)
 
     }
 
@@ -482,7 +483,7 @@ class Level2 extends Level{
 
     }
 
-    createObjectTest(scene){
+    createCSGBase(scene){
         let mat = new THREE.MeshPhongMaterial({color: 'red', shininess:500});
         let cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1))
         let cylinderMesh = new THREE.Mesh( new THREE.CylinderGeometry(0.5, 0.5, 1, 20))
@@ -503,10 +504,10 @@ class Level2 extends Level{
 
         let base = CSG.toMesh(csgBase, new THREE.Matrix4())
         base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess:500})
-        base.position.set(1, 4, 0)
+       // base.position.set(1, 4, 0)
         //this.base.object = base;
 
-        scene.add(base)
+       // scene.add(base)
 
         return base;
     }

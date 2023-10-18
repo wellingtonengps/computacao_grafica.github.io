@@ -6,6 +6,7 @@ import {
     SecondaryBox,
 } from "../libs/util/util.js";
 import {GameState} from "./gameState.js";
+import {CSG} from "../libs/other/CSGMesh.js";
 
 
 
@@ -399,10 +400,11 @@ class Base extends Component{
     constructor(height, width, depth, x, y, z) {
         super();
         this.height = height;
-        this.width = width;
+        this.width = 2*Math.sqrt(Math.pow((width/2),2)- Math.pow((width/2 - height), 2));
         this.depth = depth;
         let baseGeometry = new THREE.BoxGeometry(width, height, depth);
-        let base = new THREE.Mesh(baseGeometry, material);
+        let base2 = new THREE.Mesh(baseGeometry, material);
+        let base = this.createCSGBase(height, width, depth);
         let bbBase = new THREE.Box3().setFromObject(base);
         this.object = base;
         this.boundingBox = bbBase;
@@ -410,8 +412,9 @@ class Base extends Component{
         bbBase.setFromObject(this.object)
         this.surfaceNormal =  new THREE.Vector3(0, 1, 0);
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
-
         base.castShadow = true
+        /*base2.position.set(x, y, z);
+        this.object = base2;*/
     }
 
     update() {
@@ -433,12 +436,40 @@ class Base extends Component{
         return this.helper;
     }
 
+    createCSGBase(height, width, depth){
+        let mat = new THREE.MeshPhongMaterial({color: 'red', shininess:500});
+        let cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(width, width, depth))
+        let cylinderMesh = new THREE.Mesh( new THREE.CylinderGeometry(width/2, width/2, depth, 20))
+
+        cubeMesh.position.set(0, -height -(width/2 - height + height/2), 0)
+        cubeMesh.matrixAutoUpdate = false;
+        cubeMesh.updateMatrix();
+
+        cylinderMesh.position.set(0, -(width/2 - height + height/2), 0)
+        cylinderMesh.rotateX(Math.PI/2)
+        cylinderMesh.matrixAutoUpdate = false;
+        cylinderMesh.updateMatrix();
+
+        let outerCyCSG = CSG.fromMesh(cylinderMesh)
+        let cubeCSG = CSG.fromMesh(cubeMesh);
+
+        let csgBase = outerCyCSG.subtract(cubeCSG)
+
+        let base = CSG.toMesh(csgBase, new THREE.Matrix4())
+        base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess:500})
+        //base.position.set(1, 10, 0)
+        //this.base.object = base;
+        // scene.add(base)
+
+        return base;
+    }
+
     getSurfaceNormalByPoint(point) {
         super.getSurfaceNormalByPoint(point);
         let relativeX = point.x - this.getPosition().x + this.width/2
         let relativeY = point.y - this.getPosition().y + this.height/2
 
-        let normal = point.sub(this.getPosition()).multiplyScalar(-1).normalize()
+        let normal = point.sub(this.getPosition().sub(new THREE.Vector3(0, 2, 0))).multiplyScalar(-1).normalize()
         return normal;
 
        // return new THREE.Vector3(0, 1, 0);
