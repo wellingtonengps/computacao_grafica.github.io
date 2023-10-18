@@ -251,14 +251,14 @@ class Level2 extends Level{
     initLight(){
         //let light = initDefaultBasicLight(this.scene);
         let ambientColor = "rgb(80,80,80)"
-        let ambientLight = new THREE.AmbientLight(ambientColor);
+        let ambientLight = new THREE.AmbientLight(ambientColor, 0.7);
         this.scene.add(ambientLight);
 
 
         let position = new THREE.Vector3(2, 12, 12);
         let position2 = new THREE.Vector3(0, 0, 0);
         let lightColor = "rgb(255, 255, 255)";
-        let dirLight = new THREE.DirectionalLight(lightColor, 0.7);
+        let dirLight = new THREE.DirectionalLight(lightColor, 0.65);
             dirLight.target.position.copy(position2);
             dirLight.position.copy(position);
             dirLight.castShadow = true;
