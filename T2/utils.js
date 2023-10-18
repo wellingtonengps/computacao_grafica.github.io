@@ -8,6 +8,22 @@ function generateColor() {
     return colorPalette[Math.floor(Math.random() * colorPalette.length)];
 }
 
+function getColor(num) {
+    let colorPalette = new Map([
+        [2, "rgb(96,96,96)"],
+        [4, "rgb(4,173,72)"],
+        [5, "rgb(166,4,166)"],
+        [6, "rgb(255,183,0)"],
+        [7, "rgb(255,0,0)"],
+        [8, "rgb(0,112,255)"],
+        [9, "rgb(255,106,0)"],
+        [10, "rgb(0,255,225)"],
+        [11, "rgb(255,255,255)"]
+    ]);
+
+    return colorPalette.get(num)
+}
+
 
 
 function getColumnsRows(matrix) {
@@ -57,4 +73,4 @@ function obterMatrizPeloNivel(nivelDesejado) {
     callback(jsonData);
 }
 
-export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON, getColumns, getRows}
+export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON, getColumns, getRows, getColor}

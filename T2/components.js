@@ -7,6 +7,7 @@ import {
 } from "../libs/util/util.js";
 import {GameState} from "./gameState.js";
 import {CSG} from "../libs/other/CSGMesh.js";
+import {getColor} from "./utils.js";
 
 
 
@@ -56,8 +57,8 @@ class Component {
 
 
             const points = [];
-            points.push(object.getPosition().add(new THREE.Vector3(0,0,2)));
-            points.push(this.getPosition().add(new THREE.Vector3(0,0,2)));
+            points.push(object.getPosition().add(new THREE.Vector3(0,0,0.5)));
+            points.push(this.getPosition().add(new THREE.Vector3(0,0,0.5)));
             //points.push(new THREE.Vector3(5,5,5));
 
             console.log(object.getPosition())
@@ -138,7 +139,7 @@ class Wall extends Component {
 
     constructor(height, width, depth, x, y, z) {
         super();
-        let material = setDefaultMaterial();
+        let material = new THREE.MeshLambertMaterial({color: "rgb(114,114,114)"});
         let boxGeometry = new THREE.BoxGeometry(height, width, depth);
         let box = new THREE.Mesh(boxGeometry, material);
         box.position.set(x, y, z);
@@ -175,7 +176,8 @@ class Tile extends Component {
     constructor(width, height, depth, x, y, z, color, maxHits=1) {
         super();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
-        let box = new THREE.Mesh(boxGeometry, setDefaultMaterial(color));
+        let material = new THREE.MeshPhongMaterial({color: getColor(maxHits)})
+        let box = new THREE.Mesh(boxGeometry, material);
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
         bbBox.setFromObject(box);
@@ -187,6 +189,16 @@ class Tile extends Component {
         this.height = height;
         box.castShadow = true;
         this.maxHits = maxHits;
+
+        let edgesGeometry = new THREE.EdgesGeometry( boxGeometry ); // or WireframeGeometry( geometry )
+        let lineMaterial = new THREE.LineBasicMaterial( { color: "black", linewidth: 1 } );
+        let wireframe = new THREE.LineSegments( edgesGeometry, lineMaterial );
+
+        this.wireframe = wireframe;
+
+        if(maxHits> 2){
+            this.maxHits =1;
+        }
     }
 
     getHelper() {

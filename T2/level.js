@@ -238,13 +238,13 @@ class Level2 extends Level{
         let aspect = 16/8;
         let fov = 90;
 
-        let camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100);
+        let camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 20);
 
 
-        camera.position.set(4, 8, 8.25)
+        camera.position.set(4.625, 8, 8.25)
         this._camera = camera;
 
-        camera.lookAt(4, 8, 0);
+        camera.lookAt(4.625, 8, 0);
         camera.updateProjectionMatrix();
     }
 
@@ -334,21 +334,24 @@ class Level2 extends Level{
         //let offsety = 0.5;
 
 
+
         for (let i = 0; i < numRows; i++) {
             let row = [];
             for (let j = 0; j < rowSize; j++) {
+                let tileX = tileWallStartX + tileWidth / 2 + j * tileWidth;
+                let tileY = tileWallStartY + tileHeight / 2 - i * tileHeight;
+
                 if(matrix[i][j] >= 1) {
                     //todo: mudei aqui para inverter
-                    let tile = new Tile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStartY + tileHeight / 2 - i * tileHeight, 0, generateColor(), matrix[i][j])
+                    let tile = new Tile(tileWidth, tileHeight, 0.5, tileX , tileY, 0, generateColor(), matrix[i][j])
                     tile.setOnCollide(this.incrementCollisionCount)
                     tile.scene = this.scene;
-                    //scene.add(tile.getHelper());
                     row.push(tile);
                     this.collisionManager.registerCollidable(tile);
                 }else if(matrix[i][j] === 0){
                     row.push(null);
                 }else if(matrix[i][j] === -1){
-                    let tile = new PowerUpTile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStartY + tileHeight / 2 - i * tileHeight, 0, generateColor(), 1)
+                    let tile = new PowerUpTile(tileWidth, tileHeight, 0.5,  tileX , tileY, 0, generateColor(), 1)
                     tile.setOnCollide(this.incrementCollisionCount)
                     tile.scene = this.scene;
                     //scene.add(tile.getHelper());
@@ -383,7 +386,7 @@ class Level2 extends Level{
         //let tileWallStartY = 12;
         let tileWallStartY = 14;
         let tileWidth = 0.75;
-        let tileHeight = 0.25;
+        let tileHeight = 0.40;
         let rowSize = getColumns(matrix);
         let numRows = getRows(matrix);
 
@@ -437,7 +440,7 @@ class Level2 extends Level{
     createBackgroundPlane(scene) {
         let planeGeometry = new THREE.PlaneGeometry(9.25, 16.00, 20, 20);
         let planeMaterial = new THREE.MeshLambertMaterial({
-            color: "rgb(0,255,255)",
+            color: "rgb(136,136,136)",
         });
         planeMaterial.side = THREE.DoubleSide;
         planeMaterial.transparent = true;
