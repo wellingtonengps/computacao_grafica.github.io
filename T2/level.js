@@ -11,6 +11,7 @@ import {Ball, Base, Wall, Tile, PowerUpTile} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
 import {generateColor, getColumns, getColumnsRows, getRows} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
+import {GameState} from "./gameState.js";
 //import scene from "../build/jsm/offscreen/scene";
 
 class Level{
@@ -230,6 +231,8 @@ class Level{
 class Level1 extends Level{}
 
 class Level2 extends Level{
+
+    updates = []
     initCamera(){
         let orthoSize = 16;
         let w = window.innerWidth;
@@ -264,7 +267,7 @@ class Level2 extends Level{
             dirLight.castShadow = true;
             dirLight.shadow.mapSize.width = 2048;
             dirLight.shadow.mapSize.height = 2048;
-            dirLight.shadow.camera.near = .0;
+            dirLight.shadow.camera.near = 0.0;
             dirLight.shadow.camera.far = 40;
             dirLight.shadow.camera.left = -20;
             dirLight.shadow.camera.right = 20;
@@ -307,6 +310,25 @@ class Level2 extends Level{
 
     incrementCollisionCount(){
         this._countTiles++;
+    }
+
+    powerUp(){
+        let sphereRadius = 0.2;
+        this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
+        let baseHeight = 0.5;
+        let baseWidth = 2.0;
+      //  this.ball = ball;
+       // GameState.ballId = this.ball.id;
+        let ball = new Ball(sphereRadius, this.baseStartPos.x, this.baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
+
+        ball.scene = this.scene;
+        this.scene.add(ball.getObject());
+
+        // movimento inicial
+        ball.setMovement(new THREE.Vector3(0.2,0.2,0), 0);
+
+        //register collidable
+        this.collisionManager.registerCollider(ball)
     }
 
     /*
@@ -352,11 +374,13 @@ class Level2 extends Level{
                     row.push(null);
                 }else if(matrix[i][j] === -1){
                     let tile = new PowerUpTile(tileWidth, tileHeight, 0.5,  tileX , tileY, 0, generateColor(), 1)
-                    tile.setOnCollide(this.incrementCollisionCount)
+                    tile.setOnCollide(this.incrementCollisionCount);
                     tile.scene = this.scene;
                     //scene.add(tile.getHelper());
                     row.push(tile);
+                    this.updates.push(tile);
                     this.collisionManager.registerCollidable(tile);
+                    this.collisionManager.registerCollider(tile);
                 }
             }
             this.tileMatrix.push(row)
@@ -373,6 +397,12 @@ class Level2 extends Level{
         }
 
 
+    }
+
+    updateObjects(){
+        for(let i=0; i< this.updates.length; i++){
+            this.updates[i].update();
+        }
     }
 
     getTotalTiles(){
@@ -408,6 +438,8 @@ class Level2 extends Level{
 
         this.ball = ball;
         this.base = base;
+        GameState.ballId = this.ball.id;
+        GameState.baseId = this.base.id;
 
         wallTop.surfaceNormal = new THREE.Vector3(0, -1, 0);
         wallLeft.surfaceNormal = new THREE.Vector3(-1,0,0);

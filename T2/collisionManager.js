@@ -13,7 +13,7 @@ class CollisionManager{
 
                 let collided = this.colliderObjs[i].getBoundingBox().intersectsBox(this.collidableObjs[j].getBoundingBox())
 
-                if(collided){
+                if(collided && this.colliderObjs[i].id !== this.collidableObjs[j].id){
                     this.colliderObjs[i].collide(this.collidableObjs[j])
                     this.collidableObjs[j].collide(this.colliderObjs[i])
                 }

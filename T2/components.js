@@ -61,7 +61,7 @@ class Component {
             points.push(this.getPosition().add(new THREE.Vector3(0,0,0.5)));
             //points.push(new THREE.Vector3(5,5,5));
 
-            console.log(object.getPosition())
+          //  console.log(object.getPosition())
 
             const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
@@ -230,8 +230,8 @@ class Tile extends Component {
     }
 
     collide(object) {
-        console.log(this.active)
-        if(this.active===true){
+        //console.log(this.active)
+        if(this.active===true && object.id === GameState.ballId ){
 
             super.collide(object);
             this.hits++;
@@ -255,7 +255,7 @@ class Tile extends Component {
         //super.getSurfaceNormalByPoint(point);
         let relativeX = point.x - this.getPosition().x + this.width/2;
         let relativeY = point.y - this.getPosition().y + this.height/2;
-        console.log(relativeX)
+       // console.log(relativeX)
 
         if(relativeX <= 0){
             return new THREE.Vector3(-1,0,0);
@@ -370,8 +370,8 @@ class Ball extends Component {
 
             this.movementDirection = newDirection;
 
-            console.log("Normal:")
-            console.log(addedNormalVectors)
+           // console.log("Normal:")
+            //console.log(addedNormalVectors)
 
             this.collidedWith = []
         }
@@ -519,6 +519,49 @@ class PowerUpTile extends Tile{
         this.height = height;
         box.castShadow = true;
         this.maxHits = maxHits;
+        this.fallSpeed = 0.1;
+    }
+
+    update() {
+        super.update();
+
+        if(this._hits>=1){
+            let pos = this.getPosition();
+            this.setPosition(pos.x, pos.y - this.fallSpeed, pos.z);
+        }
+
+        if(this.getPosition().y <= 0){
+            this.destroyTile()
+        }
+    }
+
+    destroyTile(){
+        this.active = false;
+        this.object.visible = false;
+        this.object.removeFromParent();
+        this.object.geometry.dispose();
+        this.object.material.dispose();
+    }
+
+
+    collide(object) {
+
+        if(this.active===true ){
+            //super.collide(object);
+            if(object.id === GameState.ballId && this.hits === 0){
+                this._hits++;
+                this.active = false;
+
+            }
+            /*if(this._onCollide != null){
+                this._onCollide()
+            }*/
+        }
+        if(object.id === GameState.baseId){
+            console.log("Bateu na baseeeee")
+            this.destroyTile();
+        }
+
     }
 
 }

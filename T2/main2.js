@@ -27,7 +27,31 @@ let levelNumber= 1;
 
 window.addEventListener("mousemove", onMouseMove);
 window.addEventListener("click", onMouseClick);
+window.addEventListener(
+    "resize",
+    function () {
+        onWindowResize(level.camera, renderer);
+    },
+    false
+);
 
+function onWindowResize(camera, renderer, frustumSize = 16) {
+    let w = window.innerWidth;
+    let h = window.innerHeight
+    let aspect = w / h;
+    let f = frustumSize;
+    if (camera instanceof THREE.PerspectiveCamera) {
+        camera.aspect = aspect;
+    }
+    if (camera instanceof THREE.OrthographicCamera) {
+        camera.left = -f * aspect / 2;
+        camera.right = f * aspect / 2;
+        camera.top = f / 2;
+        camera.bottom = -f / 2;
+    }
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+}
 
 function onMouseMove(event) {
     event.preventDefault();
@@ -42,6 +66,13 @@ function onMouseClick(event){
     }
 }
 
+function toggleFullScreenMode(){
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+}
 
 function keyboardUpdate() {
 
@@ -152,15 +183,12 @@ function initLevel(levelNumber) {
     })
 
 
-
-
-
-
     level.initGameScene(scene);
     level.createObjects(scene);
     level.createBackgroundPlane(scene);
     level.initCamera(scene);
     level.initLight(scene);
+    onWindowResize(level.camera, renderer);
 }
 
 
@@ -176,11 +204,13 @@ function render() {
         sphereFollowBase()
         level.ball.update();
 
+
     }else if(!gamePaused){
         moveBaseToRaycasterXPosition();
         level.base.update();
         level.ball.update();
         level.collisionManager.checkCollisions();
+        level.updateObjects();
         checkGameOver();
         checkWinGame();
     }
