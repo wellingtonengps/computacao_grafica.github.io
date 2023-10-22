@@ -8,7 +8,7 @@ import {
 } from "../libs/util/util.js";
 import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile} from "./components.js";
-import {Level, Level2} from "./level.js";
+import {Level} from "./level.js";
 import {CollisionManager} from "./collisionManager.js";
 import {generateColor, lerArquivoJSON, obterMatrizPeloNivel} from "./utils.js";
 
@@ -166,9 +166,9 @@ function initLevel(levelNumber) {
     scene = new THREE.Scene();
 
     if(levelNumber === 1){
-        level = new Level2(scene);
+        level = new Level(scene);
     }else if(levelNumber === 2){
-        level = new Level2(scene);
+        level = new Level(scene);
     }
 
 
