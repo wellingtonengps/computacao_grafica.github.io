@@ -265,6 +265,7 @@ class Level2 extends Level{
             dirLight.target.position.copy(position2);
             dirLight.position.copy(position);
             dirLight.castShadow = true;
+            dirLight.shadow.radius = 4;
             dirLight.shadow.mapSize.width = 2048;
             dirLight.shadow.mapSize.height = 2048;
             dirLight.shadow.camera.near = 0.0;
@@ -431,8 +432,8 @@ class Level2 extends Level{
         let baseWidth = 2.0;
 
         let wallTop = new Wall(9.25, 0.5, 0.5, 4.625, 15.75, 0.0);
-        let wallLeft = new Wall(0.5, 16, 0.5, 0.25, 8.0, 0.0);
-        let wallRight = new Wall(0.5, 16, 0.5, 9.00, 8.0, 0.0);
+        let wallLeft = new Wall(0.5, 18, 0.5, 0.25, 8.0, 0.0);
+        let wallRight = new Wall(0.5, 18, 0.5, 9.00, 8.0, 0.0);
         let base = new Base(baseHeight, baseWidth, 0.5, this.baseStartPos.x, this.baseStartPos.y, this.baseStartPos.z)
         let ball = new Ball(sphereRadius, this.baseStartPos.x, this.baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
 
@@ -470,7 +471,7 @@ class Level2 extends Level{
     }
 
     createBackgroundPlane(scene) {
-        let planeGeometry = new THREE.PlaneGeometry(9.25, 16.00, 20, 20);
+        let planeGeometry = new THREE.PlaneGeometry(9.25, 18.00, 20, 20);
         let planeMaterial = new THREE.MeshLambertMaterial({
             color: "rgb(136,136,136)",
         });
