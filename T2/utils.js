@@ -57,9 +57,6 @@ function lerArquivoJSON(caminho, nivel, callback) {
         });
 }
 
-// Exemplo de uso:
-
-
 
 function obterMatrizPeloNivel(nivelDesejado) {
 

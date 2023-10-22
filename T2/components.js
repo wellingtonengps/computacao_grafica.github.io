@@ -244,10 +244,11 @@ class Tile extends Component {
                 this.getObject().material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
             }
 
-
             if(this._onCollide != null){
-                this._onCollide()
+                this._onCollide(this._hits);
             }
+
+
         }
     }
 

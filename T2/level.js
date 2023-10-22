@@ -24,7 +24,7 @@ class Level {
     baseHeight;
     baseWidth;
 
-    _countTiles = 0;
+
     ball;
     base;
     tileMatrix = [];
@@ -37,6 +37,7 @@ class Level {
 
     constructor(scene) {
         this.scene = scene;
+        this.hits = 0;
     }
     initCamera(){
         let orthoSize = 16;
@@ -116,8 +117,9 @@ class Level {
        }
    }
 
-    incrementCollisionCount(){
-        this._countTiles++;
+    incrementCollisionCount(value){
+        this.hits = this.hits + value;
+        console.log(this.hits)
     }
 
     powerUp(){
@@ -174,13 +176,13 @@ class Level {
                 if(matrix[i][j] >= 1) {
                     //todo: mudei aqui para inverter
                     let tile = new Tile(tileWidth, tileHeight, 0.5, tileX , tileY, 0, generateColor(), matrix[i][j])
-                    tile.setOnCollide(this.incrementCollisionCount)
+                    tile.setOnCollide(this.incrementCollisionCount.bind(this))
                     tile.scene = this.scene;
                     row.push(tile);
                     this.collisionManager.registerCollidable(tile);
                 }else if(matrix[i][j] === 0){
                     row.push(null);
-                }else if(matrix[i][j] === -1){
+                } /*else if(matrix[i][j] === -1){
                     let tile = new PowerUpTile(tileWidth, tileHeight, 0.5,  tileX , tileY, 0, generateColor(), 1)
                     tile.setOnCollide(this.incrementCollisionCount);
                     tile.scene = this.scene;
@@ -189,11 +191,10 @@ class Level {
                     this.updates.push(tile);
                     this.collisionManager.registerCollidable(tile);
                     this.collisionManager.registerCollider(tile);
-                }
+                }*/
             }
             this.tileMatrix.push(row)
         }
-
 
 
         for (let i = numRows - 1; i >= 0; i--) {
