@@ -24,6 +24,11 @@ renderer.shadowMap.type = THREE.VSMShadowMap;
 let level;
 let mouse = new THREE.Vector2();
 let levelNumber= 1;
+let initialBallSpeed = 0.05;
+let ballSpeed = initialBallSpeed;
+
+var infoBox = new SecondaryBox();
+infoBox.changeMessage("--")
 
 window.addEventListener("mousemove", onMouseMove);
 window.addEventListener("click", onMouseClick);
@@ -34,6 +39,20 @@ window.addEventListener(
     },
     false
 );
+let timer;
+
+function startSpeedTimer(){
+    timer = window.setInterval((e)=>{
+        if(ballSpeed <=0.2){
+            ballSpeed += 0.0013
+        }else{
+            ballSpeed = 0.2
+            window.clearInterval(timer)
+        }
+
+    }, 100);
+}
+
 
 function onWindowResize(camera, renderer, frustumSize = 16) {
     let w = window.innerWidth;
@@ -61,8 +80,9 @@ function onMouseMove(event) {
 
 function onMouseClick(event){
     if(event.button === 0 && gameStarted === false){
-        level.ball.setMovement(new THREE.Vector3(0,1,0), 0.2)
-        gameStarted = true;
+        level.ball.setMovement(new THREE.Vector3(0,1,0), ballSpeed)
+        startGame(true);
+        startSpeedTimer();
     }
 }
 
@@ -97,6 +117,8 @@ function keyboardUpdate() {
 function restartGame() {
     startGame(false);
     initLevel(levelNumber);
+    ballSpeed = initialBallSpeed;
+    window.clearInterval(timer)
 }
 
 function checkWinGame() {
@@ -123,12 +145,16 @@ function pauseGame(status){
 
 function startGame(status) {
     gameStarted = status;
+    ballSpeed = initialBallSpeed;
+
 }
 
 function nextLevel() {
     levelNumber = levelNumber + 1;
     startGame(false);
     initLevel(levelNumber)
+    window.clearInterval(timer)
+
 }
 
 
@@ -202,6 +228,7 @@ render();
 
 function render() {
     keyboardUpdate();
+    infoBox.changeMessage("Speed: " +  ballSpeed.toFixed(2))
 
     if(!gameStarted){
         moveBaseToRaycasterXPosition();
@@ -213,6 +240,7 @@ function render() {
     }else if(!gamePaused){
         moveBaseToRaycasterXPosition();
         level.base.update();
+        level.ball.setMovement(level.ball.movementDirection, ballSpeed)
         level.ball.update();
         level.collisionManager.checkCollisions();
         level.updateObjects();
