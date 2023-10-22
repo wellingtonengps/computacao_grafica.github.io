@@ -126,8 +126,9 @@ function startGame(status) {
 }
 
 function nextLevel() {
+    levelNumber = levelNumber + 1;
     startGame(false);
-    initLevel(levelNumber++)
+    initLevel(levelNumber)
 }
 
 
@@ -165,12 +166,7 @@ function sphereFollowBase(){
 function initLevel(levelNumber) {
     scene = new THREE.Scene();
 
-    if(levelNumber === 1){
-        level = new Level(scene);
-    }else if(levelNumber === 2){
-        level = new Level(scene);
-    }
-
+    level = new Level(scene);
 
     /*
     const matrix = [
