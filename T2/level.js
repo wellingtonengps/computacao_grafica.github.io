@@ -165,7 +165,7 @@ class Level{
     createBackgroundPlane(scene) {
         let planeGeometry = new THREE.PlaneGeometry(8, 16, 20, 20);
         let planeMaterial = new THREE.MeshLambertMaterial({
-            color: "rgb(0,255,255)",
+            color: "rgb(71, 69, 78)",
         });
         planeMaterial.side = THREE.DoubleSide;
         planeMaterial.transparent = true;
@@ -472,7 +472,7 @@ class Level2 extends Level{
     createBackgroundPlane(scene) {
         let planeGeometry = new THREE.PlaneGeometry(9.25, 16.00, 20, 20);
         let planeMaterial = new THREE.MeshLambertMaterial({
-            color: "rgb(136,136,136)",
+            color: "rgb(71, 69, 78)",
         });
         planeMaterial.side = THREE.DoubleSide;
         planeMaterial.transparent = true;

@@ -139,7 +139,7 @@ class Wall extends Component {
 
     constructor(height, width, depth, x, y, z) {
         super();
-        let material = new THREE.MeshLambertMaterial({color: "rgb(114,114,114)"});
+        let material = new THREE.MeshLambertMaterial({color: "rgb(71, 69, 78)"});
         let boxGeometry = new THREE.BoxGeometry(height, width, depth);
         let box = new THREE.Mesh(boxGeometry, material);
         box.position.set(x, y, z);
