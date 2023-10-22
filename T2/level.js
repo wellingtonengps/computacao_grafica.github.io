@@ -9,7 +9,7 @@ import {
 import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile, PowerUpTile} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
-import {generateColor, getColumns, getColumnsRows, getRows} from "./utils.js";
+import {generateColor, getColumns, getColumnsRows, getRows, lerArquivoJSON} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 import {GameState} from "./gameState.js";
 //import scene from "../build/jsm/offscreen/scene";
@@ -17,8 +17,8 @@ import {GameState} from "./gameState.js";
 class Level{
 
     //create tiles
-    rowSize = 7;
-    numRows = 5
+    rowSize;
+    numRows;
 
     baseStartPos;
     sphereRadius;
@@ -117,6 +117,7 @@ class Level{
         let tileWallStartY = 12;
         let tileWidth = 1.0;
         let tileHeight = 0.5;
+
 
         this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, this.scene);
         this.resetTiles(this.numRows, this.rowSize);
@@ -304,6 +305,8 @@ class Level2 extends Level{
                if(this.tileMatrix[i][j] !== null){
                    this.tileMatrix[i][j].getObject().visible=true;
                    this.tileMatrix[i][j].active=true;
+                   this.tileMatrix[i][j].hits = 0;
+
                }
            }
        }
@@ -418,11 +421,12 @@ class Level2 extends Level{
         let tileWallStartY = 14;
         let tileWidth = 0.75;
         let tileHeight = 0.40;
-        let rowSize = getColumns(matrix);
-        let numRows = getRows(matrix);
+        this.rowSize = getColumns(matrix);
+        this.numRows = getRows(matrix);
 
-        this.renderTiles(numRows, rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
-        this.resetTiles(numRows, rowSize);
+
+        this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
+        this.resetTiles(this.numRows, this.rowSize);
     }
 
     initGameScene(){
@@ -556,7 +560,7 @@ class Level2 extends Level{
         this.ball.setPosition(this.baseStartPos.x, this.baseStartPos.y + 0.01 + this.base.height / 2 + this.ball.radius, 0);
         this.ball.movementSpeed = 0;
         this.countTiles = 0;
-        this.resetTiles();
+        this.resetTiles(this.numRows, this.rowSize);
     }
 
     set countTiles(value) {

@@ -86,16 +86,17 @@ function keyboardUpdate() {
     } else if (keyboard.down("enter")){
         toggleFullScreenMode();
     }
-    else if("G"){
-
+    else if(keyboard.down("G")){
+        nextLevel();
     }
 
 }
 
-function restartGame() {
 
+
+function restartGame() {
     startGame(false);
-    level.restartLevel();
+    initLevel(levelNumber);
 }
 
 function checkWinGame() {
@@ -122,6 +123,11 @@ function pauseGame(status){
 
 function startGame(status) {
     gameStarted = status;
+}
+
+function nextLevel() {
+    startGame(false);
+    initLevel(levelNumber++)
 }
 
 
@@ -161,6 +167,8 @@ function initLevel(levelNumber) {
 
     if(levelNumber === 1){
         level = new Level2(scene);
+    }else if(levelNumber === 2){
+        level = new Level2(scene);
     }
 
 
@@ -176,7 +184,7 @@ function initLevel(levelNumber) {
     //let matrix = obterMatrizPeloNivel(0)
 
 
-    lerArquivoJSON("matrixLevel.json", 2, (data) => {
+    lerArquivoJSON("matrixLevel.json", levelNumber, (data) => {
         let matrix = [];
         matrix = data;
         level.initTileMatrix(matrix);
@@ -192,7 +200,8 @@ function initLevel(levelNumber) {
 }
 
 
-initLevel(1);
+
+initLevel(levelNumber);
 render();
 
 function render() {
@@ -217,4 +226,5 @@ function render() {
 
     requestAnimationFrame(render);
     renderer.render(scene, level.camera); // Render scene
+
 }
