@@ -1,21 +1,11 @@
 import * as THREE from "three";
-import {
-    initRenderer,
-    initDefaultBasicLight,
-    setDefaultMaterial,
-    SecondaryBox,
-} from "../libs/util/util.js";
+import {setDefaultMaterial,} from "../libs/util/util.js";
 import {GameState} from "./gameState.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 import {getColor} from "./utils.js";
 
 
-
 let material = setDefaultMaterial();
-
-// constructor
-// getBoundingBox()
-// collide()
 
 class Component {
     boundingBox = null;
@@ -24,7 +14,7 @@ class Component {
     _surfaceNormal = null;
     active = true;
     _scene = null;
-    _lastColided = null;
+    _lastCollided = null;
     collidedWith = []
 
     constructor() {
@@ -43,13 +33,13 @@ class Component {
         this.boundingBox.setFromObject(this.object);
     };
 
-    getRayIntersectionPoint(object){
+    getRayIntersectionPoint(object) {
         let raycaster = new THREE.Raycaster();
         let direction = object.getPosition().sub(this.getPosition()).normalize()
         raycaster.set(this.getPosition(), direction);
         let intersects = raycaster.intersectObject(object.getObject());
 
-        if(this.scene){
+        if (this.scene) {
             const material = new THREE.LineBasicMaterial({
                 color: "rgb(255,255,255)",
                 linewidth: 2
@@ -57,33 +47,27 @@ class Component {
 
 
             const points = [];
-            points.push(object.getPosition().add(new THREE.Vector3(0,0,0.5)));
-            points.push(this.getPosition().add(new THREE.Vector3(0,0,0.5)));
-            //points.push(new THREE.Vector3(5,5,5));
+            points.push(object.getPosition().add(new THREE.Vector3(0, 0, 0.5)));
+            points.push(this.getPosition().add(new THREE.Vector3(0, 0, 0.5)));
 
-          //  console.log(object.getPosition())
 
-            const geometry = new THREE.BufferGeometry().setFromPoints( points );
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-            const line = new THREE.Line( geometry, material );
-            this._scene.add( line );
-            //this._scene.updateMatrixWorld()
+            const line = new THREE.Line(geometry, material);
+            this._scene.add(line);
         }
 
-        if(intersects.length == 0){
-            return new THREE.Vector3(0,0,0)
+        if (intersects.length === 0) {
+            return new THREE.Vector3(0, 0, 0)
         }
 
-        //console.log(intersects[0])
         return intersects[0].point
     }
+
     collide(object) {
         this.collidedWith.push(object)
 
-        this.lastColided = object.id;
-        console.log(this._id + " colide com " + object.id )
-
-
+        this.lastCollided = object.id;
     }
 
     get id() {
@@ -95,12 +79,12 @@ class Component {
     }
 
 
-    get lastColided() {
-        return this._lastColided;
+    get lastCollided() {
+        return this._lastCollided;
     }
 
-    set lastColided(value) {
-        this._lastColided = value;
+    set lastCollided(value) {
+        this._lastCollided = value;
     }
 
     get scene() {
@@ -119,27 +103,26 @@ class Component {
         this._surfaceNormal = value;
     }
 
-    setPosition(x, y, z){
+    setPosition(x, y, z) {
         this.object.matrixAutoUpdate = true;
         this.object.position.set(x, y, z);
-        //this.update();
-        //this.object.updateMatrixWorld();
     }
 
-    getPosition(){
+    getPosition() {
         let pos = new THREE.Vector3();
         this.object.getWorldPosition(pos);
         return pos;
     }
 
-    deleteObject(){
+    deleteObject() {
         this.object.geometry.dispose();
         this.object.material.dispose();
-        this.object.visible =false;
-        this.object.active =false;
+        this.object.visible = false;
+        this.object.active = false;
     }
 
-    getSurfaceNormalByPoint(point){}
+    getSurfaceNormalByPoint(point) {
+    }
 }
 
 class Wall extends Component {
@@ -156,14 +139,15 @@ class Wall extends Component {
         this.boundingBox = bbBox;
         this.object = box;
         this.surfaceNormal = new THREE.Vector3(0, -1, 0);
-        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
 
         box.castShadow = true;
     }
 
-    getHelper(){
+    getHelper() {
         return this.helper;
     }
+
     update() {
         super.update();
     }
@@ -180,7 +164,7 @@ class Tile extends Component {
     _hits = 0;
     _onDestroy = null;
 
-    constructor(width, height, depth, x, y, z, color, maxHits=1) {
+    constructor(width, height, depth, x, y, z, color, maxHits = 1) {
         super();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
         let material = new THREE.MeshPhongMaterial({color: getColor(maxHits)})
@@ -191,20 +175,20 @@ class Tile extends Component {
         this.boundingBox = bbBox;
         this.object = box;
         this.surfaceNormal = new THREE.Vector3(0, -1, 0);
-        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
         this.width = width;
         this.height = height;
         box.castShadow = true;
         this.maxHits = maxHits;
 
-        let edgesGeometry = new THREE.EdgesGeometry( boxGeometry ); // or WireframeGeometry( geometry )
-        let lineMaterial = new THREE.LineBasicMaterial( { color: "black", linewidth: 1 } );
-        let wireframe = new THREE.LineSegments( edgesGeometry, lineMaterial );
+        let edgesGeometry = new THREE.EdgesGeometry(boxGeometry); // or WireframeGeometry( geometry )
+        let lineMaterial = new THREE.LineBasicMaterial({color: "black", linewidth: 1});
+        let wireframe = new THREE.LineSegments(edgesGeometry, lineMaterial);
 
         this.wireframe = wireframe;
 
-        if(maxHits> 2){
-            this.maxHits =1;
+        if (maxHits > 2) {
+            this.maxHits = 1;
         }
     }
 
@@ -232,46 +216,42 @@ class Tile extends Component {
         super.update();
     }
 
-    setOnDestroy(func){
-        this._onDestroy  = func;
+    setOnDestroy(func) {
+        this._onDestroy = func;
     }
 
     collide(object) {
-        //console.log(this.active)
-        if(this.active===true && object instanceof Ball){
+        if (this.active === true && object instanceof Ball) {
 
             super.collide(object);
             this.hits++;
 
-            if(this.hits ==this.maxHits){
+            if (this.hits === this.maxHits) {
                 this.active = false;
                 this.object.visible = false;
 
-                if(this._onDestroy != null){
+                if (this._onDestroy != null) {
                     this._onDestroy(this);
                 }
-            }
-            else{
-                this.getObject().material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+            } else {
+                this.getObject().material = new THREE.MeshBasicMaterial({color: 0xffffff});
             }
 
         }
     }
 
     getSurfaceNormalByPoint(point) {
-        //super.getSurfaceNormalByPoint(point);
-        let relativeX = point.x - this.getPosition().x + this.width/2;
-        let relativeY = point.y - this.getPosition().y + this.height/2;
-       // console.log(relativeX)
+        let relativeX = point.x - this.getPosition().x + this.width / 2;
+        let relativeY = point.y - this.getPosition().y + this.height / 2;
 
-        if(relativeX <= 0){
-            return new THREE.Vector3(-1,0,0);
-        }else if(relativeX >=this.width){
-            return new THREE.Vector3(1,0,0);
-        }else if(relativeY>=this.height){
-            return new THREE.Vector3(0,1,0);
-        }else if(relativeY<= 0){
-            return new THREE.Vector3(0,-1,0);
+        if (relativeX <= 0) {
+            return new THREE.Vector3(-1, 0, 0);
+        } else if (relativeX >= this.width) {
+            return new THREE.Vector3(1, 0, 0);
+        } else if (relativeY >= this.height) {
+            return new THREE.Vector3(0, 1, 0);
+        } else if (relativeY <= 0) {
+            return new THREE.Vector3(0, -1, 0);
         }
 
         return this.surfaceNormal;
@@ -279,16 +259,10 @@ class Tile extends Component {
 
 }
 
-function Movement(speed, direction) {
-    this.speed = speed;
-    this.vector = direction;
-}
-
 class Ball extends Component {
 
     constructor(radius, x, y, z) {
         super();
-        //let sphereRadius = 0.2;
         let material = setDefaultMaterial();
         let sphereGeometry = new THREE.SphereGeometry(radius, 32, 16);
         let sphereBox = new THREE.Mesh(sphereGeometry, material);
@@ -298,7 +272,7 @@ class Ball extends Component {
         this.boundingBox = bbSphere;
         this.object = sphereBox;
         this.radius = radius;
-        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
         sphereBox.castShadow = true;
     }
 
@@ -317,8 +291,6 @@ class Ball extends Component {
         this.reactToCollisions();
         this.moveSphere();
         this.boundingBox.setFromObject(this.object);
-        //console.log("ball update " + this.movementSpeed)
-        //console.log(this.movementDirection)
     }
 
     moveSphere() {
@@ -339,25 +311,13 @@ class Ball extends Component {
             mat4.makeTranslation(sphereX + xAmount, sphereY + yAmount, 0.0)
         );
 
-        //this.object.updateMatrixWorld();
     }
 
-   /* getRayIntersectionPoint(object) {
-        //return super.getRayIntersectionPoint(object);
+    reactToCollisions() {
 
-        let raycaster = new THREE.Raycaster();
-        let direction = this.movementDirection.normalize()
-        raycaster.set(this.getPosition(), direction);
-        let intersects = raycaster.intersectObject(object.getObject());
-
-        return intersects[0].point
-    }*/
-
-    reactToCollisions(){
-
-        if(this.collidedWith.length > 0){
-            let addedNormalVectors = new THREE.Vector3(0,0,0)
-            for(let i = 0; i< this.collidedWith.length; i++){
+        if (this.collidedWith.length > 0) {
+            let addedNormalVectors = new THREE.Vector3(0, 0, 0)
+            for (let i = 0; i < this.collidedWith.length; i++) {
                 let object = this.collidedWith[i]
                 let rayIntersectionPoint = this.getRayIntersectionPoint(object);
                 let normal = object.getSurfaceNormalByPoint(rayIntersectionPoint);
@@ -365,20 +325,7 @@ class Ball extends Component {
             }
             addedNormalVectors = addedNormalVectors.normalize();
 
-            let newDirection = this.movementDirection.reflect(addedNormalVectors);
-            /*let raycaster = new THREE.Raycaster();
-            raycaster.set(this.getPosition(), newDirection.normalize())
-
-            for(let i = 0; i< this.collidedWith.length; i++) {
-                if(raycaster.intersectObject(this.collidedWith[i].getObject())){
-                    newDirection = addedNormalVectors;
-                }
-            }*/
-
-            this.movementDirection = newDirection;
-
-           // console.log("Normal:")
-            //console.log(addedNormalVectors)
+            this.movementDirection = this.movementDirection.reflect(addedNormalVectors);
 
             this.collidedWith = []
         }
@@ -386,15 +333,9 @@ class Ball extends Component {
     }
 
     collide(object) {
-        if(object.active && this.lastColided != object.id){
+        if (object.active && this.lastCollided != object.id) {
             super.collide(object);
-            //let rayIntersectionPoint = this.getRayIntersectionPoint(object);
-            //let normal = object.getSurfaceNormalByPoint(rayIntersectionPoint);
-           // this.reflect(normal);
-            //console.log("Normal:")
-            //console.log(normal)
         }
-        //object.surfaceNormal
     }
 
     reflect(normal) {
@@ -403,11 +344,11 @@ class Ball extends Component {
         let limit = null;
         let j = new THREE.Vector3(0, 1, 0);
         let angleToJ = newDirection.angleTo(j);
-        let rotationAmount = angleToJ - limit +Math.PI/10;
-        let xDirection = newDirection.x < 0? -1 : 1;
+        let rotationAmount = angleToJ - limit + Math.PI / 10;
+        let xDirection = newDirection.x < 0 ? -1 : 1;
 
         if (limit != null && angleToJ >= limit) {
-            newDirection = newDirection.applyAxisAngle(new THREE.Vector3(0, 0, 1), xDirection* rotationAmount);
+            newDirection = newDirection.applyAxisAngle(new THREE.Vector3(0, 0, 1), xDirection * rotationAmount);
         }
 
         this.setMovement(newDirection, this.movementSpeed)
@@ -415,11 +356,11 @@ class Ball extends Component {
 
 }
 
-class Base extends Component{
+class Base extends Component {
     constructor(height, width, depth, x, y, z) {
         super();
         this.height = height;
-        this.width = 2*Math.sqrt(Math.pow((width/2),2)- Math.pow((width/2 - height), 2));
+        this.width = 2 * Math.sqrt(Math.pow((width / 2), 2) - Math.pow((width / 2 - height), 2));
         this.depth = depth;
         let baseGeometry = new THREE.BoxGeometry(width, height, depth);
         let base2 = new THREE.Mesh(baseGeometry, material);
@@ -429,8 +370,8 @@ class Base extends Component{
         this.boundingBox = bbBase;
         base.position.set(x, y, z);
         bbBase.setFromObject(this.object)
-        this.surfaceNormal =  new THREE.Vector3(0, 1, 0);
-        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        this.surfaceNormal = new THREE.Vector3(0, 1, 0);
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
         base.castShadow = true
         /*base2.position.set(x, y, z);
         this.object = base2;*/
@@ -441,31 +382,25 @@ class Base extends Component{
         this.boundingBox.setFromObject(this.object)
     }
 
-    /*
-    setPosition(x, y, z) {
-        super.setPosition(x, y, z);
-        this.update();
-    }*/
-
     collide(object) {
         super.collide(object);
     }
 
-    getHelper(){
+    getHelper() {
         return this.helper;
     }
 
-    createCSGBase(height, width, depth){
-        let mat = new THREE.MeshPhongMaterial({color: 'red', shininess:500});
+    createCSGBase(height, width, depth) {
+        let mat = new THREE.MeshPhongMaterial({color: 'red', shininess: 500});
         let cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(width, width, depth))
-        let cylinderMesh = new THREE.Mesh( new THREE.CylinderGeometry(width/2, width/2, depth, 20))
+        let cylinderMesh = new THREE.Mesh(new THREE.CylinderGeometry(width / 2, width / 2, depth, 20))
 
-        cubeMesh.position.set(0, -height -(width/2 - height + height/2), 0)
+        cubeMesh.position.set(0, -height - (width / 2 - height + height / 2), 0)
         cubeMesh.matrixAutoUpdate = false;
         cubeMesh.updateMatrix();
 
-        cylinderMesh.position.set(0, -(width/2 - height + height/2), 0)
-        cylinderMesh.rotateX(Math.PI/2)
+        cylinderMesh.position.set(0, -(width / 2 - height + height / 2), 0)
+        cylinderMesh.rotateX(Math.PI / 2)
         cylinderMesh.matrixAutoUpdate = false;
         cylinderMesh.updateMatrix();
 
@@ -475,7 +410,7 @@ class Base extends Component{
         let csgBase = outerCyCSG.subtract(cubeCSG)
 
         let base = CSG.toMesh(csgBase, new THREE.Matrix4())
-        base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess:500})
+        base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess: 500})
         //base.position.set(1, 10, 0)
         //this.base.object = base;
         // scene.add(base)
@@ -485,34 +420,26 @@ class Base extends Component{
 
     getSurfaceNormalByPoint(point) {
         super.getSurfaceNormalByPoint(point);
-        let relativeX = point.x - this.getPosition().x + this.width/2
-        let relativeY = point.y - this.getPosition().y + this.height/2
+        let relativeX = point.x - this.getPosition().x + this.width / 2
+        let relativeY = point.y - this.getPosition().y + this.height / 2
 
         let normal = point.sub(this.getPosition().sub(new THREE.Vector3(0, 1, 0))).multiplyScalar(-1).normalize()
         return normal;
 
-       // return new THREE.Vector3(0, 1, 0);
-        if(relativeX>=this.width/2){
+        if (relativeX >= this.width / 2) {
             return new THREE.Vector3(0.5, 0.87, 0);
-        }
-        else {
+        } else {
             return new THREE.Vector3(-0.5, 0.87, 0);
         }
 
     }
-
-    /*getPosition(){
-        let pos = new THREE.Vector3();
-        this.object.getWorldPosition(pos);
-        return pos;
-    }*/
 }
 
-class PowerUpTile extends Tile{
+class PowerUpTile extends Tile {
 
     _onCollect;
 
-    constructor(width, height, depth, x, y, z, color, maxHits=1) {
+    constructor(width, height, depth, x, y, z, color, maxHits = 1) {
         super();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
         let material = new THREE.MeshLambertMaterial({color: "rgb(0,0,0)"})
@@ -523,7 +450,7 @@ class PowerUpTile extends Tile{
         this.boundingBox = bbBox;
         this.object = box;
         this.surfaceNormal = new THREE.Vector3(0, -1, 0);
-        this.helper = new THREE.Box3Helper(this.boundingBox, 'white' );
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
         this.width = width;
         this.height = height;
         box.castShadow = true;
@@ -546,17 +473,15 @@ class PowerUpTile extends Tile{
     update() {
         super.update();
 
-       // if(this._hits>=1){
-            let pos = this.getPosition();
-            this.setPosition(pos.x, pos.y - this.fallSpeed, pos.z);
-       // }
+        let pos = this.getPosition();
+        this.setPosition(pos.x, pos.y - this.fallSpeed, pos.z);
 
-        if(this.getPosition().y <= 0){
+        if (this.getPosition().y <= 0) {
             this.destroyTile()
         }
     }
 
-    destroyTile(){
+    destroyTile() {
         this.active = false;
         this.object.visible = false;
         this.object.removeFromParent();
@@ -567,21 +492,10 @@ class PowerUpTile extends Tile{
 
     collide(object) {
 
-      if(this.active===true ){
-           /* if(object.id === GameState.ballId && this.hits === 0){
-                this._hits++;
-                this.active = false;
-
-            }*/
-
-
-        }
-
-        if(object.id === GameState.baseId && !this.collected){
-            console.log("Bateu na baseeeee")
+        if (object.id === GameState.baseId && !this.collected) {
             this.collected = true;
 
-            if(this.onCollect !== null){
+            if (this.onCollect !== null) {
                 this.onCollect(this);
             }
             this.destroyTile();
@@ -591,4 +505,5 @@ class PowerUpTile extends Tile{
     }
 
 }
+
 export {Ball, Wall, Tile, Base, PowerUpTile}

@@ -25,19 +25,6 @@ function getColor(num) {
 }
 
 
-
-function getColumnsRows(matrix) {
-    const numRows = matrix.length;
-
-    if (numRows === 0) {
-        return { row: 0, columns: 0 };
-    }
-
-    const numCols = matrix[0].length;
-
-    return { row: numRows, columns: numCols };
-}
-
 function getColumns(matrix){
     return matrix[0].length;
 }
@@ -47,41 +34,29 @@ function getRows(matrix){
 }
 
 function getTotalTails(matrix) {
-    let contador = 0;
+    let count = 0;
 
     for (let i = 0; i < matrix.length; i++) {
         for (let j = 0; j < matrix[i].length; j++) {
             if (matrix[i][j] !== 0) {
-                contador++;
+                count++;
             }
         }
     }
 
-    return contador;
+    return count;
 }
 
-function lerArquivoJSON(caminho, nivel, callback) {
-    fetch(caminho)
+function readLevel(path, level, callback) {
+    fetch(path)
         .then(response => response.json())
         .then(data => {
-            callback(data[nivel - 1].matrix);
+            callback(data[level - 1].matrix);
         })
         .catch(error => {
-            console.error('Ocorreu um erro:', error);
+            console.error('Error:', error);
         });
 }
 
 
-function obterMatrizPeloNivel(nivelDesejado) {
-
-    let jsonData = [];
-
-    lerArquivoJSON('matrixLevel.json', (data) => {
-        jsonData = data;
-        console.log(j);
-    });
-
-    callback(jsonData);
-}
-
-export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON, getColumns, getRows, getColor, getTotalTails}
+export {generateColor, readLevel, getColumns, getRows, getColor, getTotalTails}
