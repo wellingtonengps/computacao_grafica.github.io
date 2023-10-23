@@ -38,6 +38,7 @@ class Level {
     updates = []
     ballVector = []
     _ballSpeed = 0;
+    blockBeforePowerUp = 0;
 
     constructor(scene) {
         this.scene = scene;
@@ -141,7 +142,13 @@ class Level {
         let tileWidth = 0.75;
         let tileHeight = 0.40;
 
-        if(this.hits === 2){
+
+        if(this.ballVector.length === 1){
+            this.blockBeforePowerUp++;
+            console.log("blockBeforePowerUp: " + this.blockBeforePowerUp)
+        }
+
+        if(this.blockBeforePowerUp === 2 && this.ballVector.length === 1){
             let pos = object.getPosition()
             let tile = new PowerUpTile(tileWidth, tileHeight, 0.5,  pos.x , pos.y, 0, generateColor(), 1)
             tile.onCollect = this.powerUp.bind(this);
@@ -150,6 +157,7 @@ class Level {
             this.updates.push(tile);
             this.collisionManager.registerCollidable(tile);
             this.collisionManager.registerCollider(tile);
+            this.blockBeforePowerUp = 0;
         }
     }
 
