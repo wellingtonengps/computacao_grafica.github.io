@@ -148,6 +148,12 @@ function gameOver(){
     window.clearInterval(timer)
 }
 
+function winGame(){
+    pauseGame(true);
+    nextLevel();
+}
+
+
 function pauseGame(status){
     gamePaused = status;
 }
@@ -161,9 +167,9 @@ function startGame(status) {
 function nextLevel() {
     levelNumber = levelNumber + 1;
     startGame(false);
+    pauseGame(false);
     initLevel(levelNumber)
     window.clearInterval(timer)
-
 }
 
 
@@ -228,7 +234,9 @@ function initLevel(levelNumber) {
     level.createBackgroundPlane(scene);
     level.initCamera(scene);
     level.initLight(scene);
-    level.setOnGameOver(gameOver.bind(this))
+    level.setOnGameOver(gameOver.bind(this));
+    level.setOnWinGame(winGame.bind(this));
+
     onWindowResize(level.camera, renderer);
 }
 
@@ -257,7 +265,7 @@ function render() {
         level.collisionManager.checkCollisions();
         level.updateObjects();
         //checkGameOver();
-        checkWinGame();
+        //checkWinGame();
     }
 
     requestAnimationFrame(render);

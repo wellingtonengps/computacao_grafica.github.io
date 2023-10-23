@@ -28,6 +28,7 @@ class Level {
 
     ball;
     base;
+    totalTiles = 0;
     tileMatrix = [];
     _camera;
     collisionManager = new CollisionManager();
@@ -216,6 +217,7 @@ class Level {
                     tile.scene = this.scene;
                     row.push(tile);
                     this.collisionManager.registerCollidable(tile);
+                    this.totalTiles++;
                 }else if(matrix[i][j] === 0){
                     row.push(null);
                 } /*else if(matrix[i][j] === -1){
@@ -262,13 +264,20 @@ class Level {
         if(this.ballVector.length === 0){
             this.onGameOver();
         }
+
+        if(this.hits === this.totalTiles){
+            console.log("total:" + this.totalTiles)
+            this.onWinGame();
+        }
+
         this.base.update();
         //this.ball.update();
     }
 
+    /*
     getTotalTiles(){
         return this.rowSize * this.numRows;
-    }
+    }*/
 
     initTileMatrix(matrix){
         // variables for create tile matrix;
@@ -280,6 +289,7 @@ class Level {
         let tileHeight = 0.40;
         this.rowSize = getColumns(matrix);
         this.numRows = getRows(matrix);
+
 
 
         this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
@@ -421,6 +431,10 @@ class Level {
 
     setOnGameOver(func){
         this.onGameOver = func;
+    }
+
+    setOnWinGame(func){
+        this.onWinGame = func;
     }
 
     resetBall(){
