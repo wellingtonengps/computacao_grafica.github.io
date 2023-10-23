@@ -44,12 +44,13 @@ class Level {
         this.scene = scene;
         this.hits = 0;
     }
-    initCamera(){
+
+    initCamera() {
         let orthoSize = 16;
         let w = window.innerWidth;
         let h = window.innerHeight
 
-        let aspect = 16/8;
+        let aspect = 16 / 8;
         let fov = 90;
 
         let camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 20);
@@ -62,7 +63,7 @@ class Level {
         camera.updateProjectionMatrix();
     }
 
-    initLight(){
+    initLight() {
         //let light = initDefaultBasicLight(this.scene);
         let ambientColor = "rgb(80,80,80)"
         let ambientLight = new THREE.AmbientLight(ambientColor, 0.7);
@@ -73,20 +74,20 @@ class Level {
         let position2 = new THREE.Vector3(0, 0, 0);
         let lightColor = "rgb(255, 255, 255)";
         let dirLight = new THREE.DirectionalLight(lightColor, 0.65);
-            dirLight.target.position.copy(position2);
-            dirLight.position.copy(position);
-            dirLight.castShadow = true;
-            dirLight.shadow.radius = 4;
-            dirLight.shadow.mapSize.width = 2048;
-            dirLight.shadow.mapSize.height = 2048;
-            dirLight.shadow.camera.near = 0.0;
-            dirLight.shadow.camera.far = 40;
-            dirLight.shadow.camera.left = -20;
-            dirLight.shadow.camera.right = 20;
-            dirLight.shadow.camera.top = 20;
-            dirLight.shadow.camera.bottom = -20;
+        dirLight.target.position.copy(position2);
+        dirLight.position.copy(position);
+        dirLight.castShadow = true;
+        dirLight.shadow.radius = 4;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.0;
+        dirLight.shadow.camera.far = 40;
+        dirLight.shadow.camera.left = -20;
+        dirLight.shadow.camera.right = 20;
+        dirLight.shadow.camera.top = 20;
+        dirLight.shadow.camera.bottom = -20;
 
-            this.scene.add(dirLight);
+        this.scene.add(dirLight);
     }
 
     get ballSpeed() {
@@ -95,12 +96,12 @@ class Level {
 
     set ballSpeed(value) {
         this._ballSpeed = value;
-        for(let i=0; i< this.ballVector.length; i++){
+        for (let i = 0; i < this.ballVector.length; i++) {
             this.ballVector[i].movementSpeed = this._ballSpeed;
         }
     }
 
-    shootBall(direction){
+    shootBall(direction) {
         this.ballVector[0].setMovement(direction, this._ballSpeed);
 
     }
@@ -123,34 +124,34 @@ class Level {
         }
     }*/
 
-   resetTiles(numRows, rowSize){
-       for (let i = 0; i < numRows; i++) {
-           for (let j = 0; j < rowSize; j++) {
-               if(this.tileMatrix[i][j] !== null){
-                   this.tileMatrix[i][j].getObject().visible=true;
-                   this.tileMatrix[i][j].active=true;
-                   this.tileMatrix[i][j].hits = 0;
+    resetTiles(numRows, rowSize) {
+        for (let i = 0; i < numRows; i++) {
+            for (let j = 0; j < rowSize; j++) {
+                if (this.tileMatrix[i][j] !== null) {
+                    this.tileMatrix[i][j].getObject().visible = true;
+                    this.tileMatrix[i][j].active = true;
+                    this.tileMatrix[i][j].hits = 0;
 
-               }
-           }
-       }
-   }
+                }
+            }
+        }
+    }
 
-    incrementDestroyedTileCount(object){
+    incrementDestroyedTileCount(object) {
         this.hits = this.hits + 1;
         console.log(this.hits)
         let tileWidth = 0.75;
         let tileHeight = 0.40;
 
 
-        if(this.ballVector.length === 1){
+        if (this.ballVector.length === 1) {
             this.blockBeforePowerUp++;
             console.log("blockBeforePowerUp: " + this.blockBeforePowerUp)
         }
 
-        if(this.blockBeforePowerUp === 2 && this.ballVector.length === 1){
+        if (this.blockBeforePowerUp === 2 && this.ballVector.length === 1) {
             let pos = object.getPosition()
-            let tile = new PowerUpTile(tileWidth, tileHeight, 0.5,  pos.x , pos.y, 0, generateColor(), 1)
+            let tile = new PowerUpTile(tileWidth, tileHeight, 0.5, pos.x, pos.y, 0, generateColor(), 1)
             tile.onCollect = this.powerUp.bind(this);
             tile.scene = this.scene;
             this.scene.add(tile.getObject());
@@ -161,30 +162,28 @@ class Level {
         }
     }
 
-    powerUp(object){
+    powerUp(object) {
 
-       console.log("Collected")
-        if(this.ballVector.length ===1){
-            let sphereRadius = 0.2;
-            this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
-            let baseHeight = 0.5;
-            let baseWidth = 2.0;
-            let pos = object.getPosition();
-            //  this.ball = ball;
-            // GameState.ballId = this.ball.id;
-            let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
-            ball.setMovement(new THREE.Vector3(0,1,0), this.ball.movementSpeed);
-            ball.scene = this.scene;
-            this.ballVector.push(ball);
-            this.scene.add(ball.getObject());
+        console.log("Collected")
 
-            // movimento inicial
-            //ball.setMovement(new THREE.Vector3(0.2,0.2,0), 0);
+        let sphereRadius = 0.2;
+        this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
+        let baseHeight = 0.5;
+        let baseWidth = 2.0;
+        let pos = object.getPosition();
+        //  this.ball = ball;
+        // GameState.ballId = this.ball.id;
+        let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
+        ball.setMovement(new THREE.Vector3(0, 1, 0), this.ball.movementSpeed);
+        ball.scene = this.scene;
+        this.ballVector.push(ball);
+        this.scene.add(ball.getObject());
 
-            //register collidable
-            this.collisionManager.registerCollider(ball)
-        }
+        // movimento inicial
+        //ball.setMovement(new THREE.Vector3(0.2,0.2,0), 0);
 
+        //register collidable
+        this.collisionManager.registerCollider(ball)
     }
 
     /*
@@ -218,14 +217,14 @@ class Level {
                 let tileX = tileWallStartX + tileWidth / 2 + j * tileWidth;
                 let tileY = tileWallStartY + tileHeight / 2 - i * tileHeight;
 
-                if(matrix[i][j] >= 1) {
+                if (matrix[i][j] >= 1) {
                     //todo: mudei aqui para inverter
-                    let tile = new Tile(tileWidth, tileHeight, 0.5, tileX , tileY, 0, generateColor(), matrix[i][j])
+                    let tile = new Tile(tileWidth, tileHeight, 0.5, tileX, tileY, 0, generateColor(), matrix[i][j])
                     tile.setOnDestroy(this.incrementDestroyedTileCount.bind(this))
                     tile.scene = this.scene;
                     row.push(tile);
                     this.collisionManager.registerCollidable(tile);
-                }else if(matrix[i][j] === 0){
+                } else if (matrix[i][j] === 0) {
                     row.push(null);
                 } /*else if(matrix[i][j] === -1){
                     let tile = new PowerUpTile(tileWidth, tileHeight, 0.5,  tileX , tileY, 0, generateColor(), 1)
@@ -253,26 +252,26 @@ class Level {
 
     }
 
-    updateObjects(){
-        for(let i=0; i< this.updates.length; i++){
+    updateObjects() {
+        for (let i = 0; i < this.updates.length; i++) {
             this.updates[i].update();
         }
 
-        for(let i=0; i< this.ballVector.length; i++){
+        for (let i = 0; i < this.ballVector.length; i++) {
             this.ballVector[i].update();
 
             //verifica se alguma bola foi perdida. Se sim, deleta da lista e destrói
-            if(this.ballVector[i].getPosition().y <= 0){
+            if (this.ballVector[i].getPosition().y <= 0) {
                 this.ballVector[i].deleteObject();
                 this.ballVector.splice(i, 1);
             }
         }
 
-        if(this.ballVector.length === 0){
+        if (this.ballVector.length === 0) {
             this.onGameOver();
         }
 
-        if(this.hits === this.totalTiles){
+        if (this.hits === this.totalTiles) {
             console.log("total:" + this.totalTiles)
             this.onWinGame();
         }
@@ -286,7 +285,7 @@ class Level {
         return this.rowSize * this.numRows;
     }*/
 
-    initTileMatrix(matrix){
+    initTileMatrix(matrix) {
         // variables for create tile matrix;
         let tileWallStartX = 0.5;
         //todo: mudei aqui
@@ -303,13 +302,13 @@ class Level {
         this.resetTiles(this.numRows, this.rowSize);
     }
 
-    sphereFollowBase(){
+    sphereFollowBase() {
         let posVector = this.base.getPosition();
-        this.ballVector[0].setPosition(posVector.x, posVector.y +  this.base.height/2 + this.ball.radius + 0.01, 0.0)
+        this.ballVector[0].setPosition(posVector.x, posVector.y + this.base.height / 2 + this.ball.radius + 0.01, 0.0)
         this.ballVector[0].update()
     }
 
-    initGameScene(){
+    initGameScene() {
         let sphereRadius = 0.2;
         this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
         let baseHeight = 0.5;
@@ -327,8 +326,8 @@ class Level {
         GameState.baseId = this.base.id;
 
         wallTop.surfaceNormal = new THREE.Vector3(0, -1, 0);
-        wallLeft.surfaceNormal = new THREE.Vector3(-1,0,0);
-        wallRight.surfaceNormal = new THREE.Vector3(1,0,0)
+        wallLeft.surfaceNormal = new THREE.Vector3(-1, 0, 0);
+        wallRight.surfaceNormal = new THREE.Vector3(1, 0, 0)
 
         // add objects scene
         //scene.add(this.createBackgroundPlane());
@@ -342,7 +341,7 @@ class Level {
         this.ballVector.push(ball)
 
         // movimento inicial
-        ball.setMovement(new THREE.Vector3(0,0,0), 0);
+        ball.setMovement(new THREE.Vector3(0, 0, 0), 0);
 
         //register collidable
         this.collisionManager.registerCollidable(wallLeft)
@@ -380,19 +379,19 @@ class Level {
         if (mouseIntersect != null) {
             let x = mouseIntersect.x;
             this.base.setPosition(x, 2.0, 0.0)
-            if (x <= 0.50 + baseWidth/2) {
+            if (x <= 0.50 + baseWidth / 2) {
                 //todo: tirar números mágicos
-                this.base.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
+                this.base.setPosition(0.50 + baseWidth / 2, 2.0, 0.0)
                 //ball.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
-            } else if (x >= 8 - 0.5 - baseWidth/2) {
-                this.base.setPosition(8 - 0.5 - baseWidth/2, 2.0, 0.0)
+            } else if (x >= 8 - 0.5 - baseWidth / 2) {
+                this.base.setPosition(8 - 0.5 - baseWidth / 2, 2.0, 0.0)
             }
         }
     }
 
-    createObjects(scene){
+    createObjects(scene) {
         let collisionManager = new CollisionManager();
-        let countTiles= 0;
+        let countTiles = 0;
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
 
@@ -404,17 +403,17 @@ class Level {
 
     }
 
-    createCSGBase(scene){
-        let mat = new THREE.MeshPhongMaterial({color: 'red', shininess:500});
+    createCSGBase(scene) {
+        let mat = new THREE.MeshPhongMaterial({color: 'red', shininess: 500});
         let cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1))
-        let cylinderMesh = new THREE.Mesh( new THREE.CylinderGeometry(0.5, 0.5, 1, 20))
+        let cylinderMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 20))
 
         cubeMesh.position.set(5, 1.5, 2)
         cubeMesh.matrixAutoUpdate = false;
         cubeMesh.updateMatrix();
 
         cylinderMesh.position.set(5, 2, 2)
-        cylinderMesh.rotateX(Math.PI/2)
+        cylinderMesh.rotateX(Math.PI / 2)
         cylinderMesh.matrixAutoUpdate = false;
         cylinderMesh.updateMatrix();
 
@@ -424,36 +423,37 @@ class Level {
         let csgBase = outerCyCSG.subtract(cubeCSG)
 
         let base = CSG.toMesh(csgBase, new THREE.Matrix4())
-        base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess:500})
-       // base.position.set(1, 4, 0)
+        base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess: 500})
+        // base.position.set(1, 4, 0)
         //this.base.object = base;
 
-       // scene.add(base)
+        // scene.add(base)
 
         return base;
     }
+
     get countTiles() {
         return this._countTiles;
     }
 
-    setOnGameOver(func){
+    setOnGameOver(func) {
         this.onGameOver = func;
     }
 
-    setOnWinGame(func){
+    setOnWinGame(func) {
         this.onWinGame = func;
     }
 
-    resetBall(){
+    resetBall() {
         let baseHeight = 0.5;
         let baseWidth = 2.0;
         let sphereRadius = 0.2;
 
-        for(let i=0; i< this.ballVector.length; i++){
+        for (let i = 0; i < this.ballVector.length; i++) {
             this.ballVector[i].getObject().geometry.dispose();
             this.ballVector[i].getObject().material.dispose();
-            this.ballVector[i].getObject().visible =false;
-            this.ballVector[i].getObject().active =false;
+            this.ballVector[i].getObject().visible = false;
+            this.ballVector[i].getObject().active = false;
         }
         this.ballVector = []
         let basePosition = this.base.getPosition();
@@ -463,7 +463,7 @@ class Level {
         this.collisionManager.registerCollider(ball);
 
         //this.ballVector[0].setPosition(basePosition.x, basePosition.y + 0.01 + this.base.height / 2 + this.ball.radius, 0);
-        this.ballVector[0].setMovement(new THREE.Vector3(0,0,0), 0);
+        this.ballVector[0].setMovement(new THREE.Vector3(0, 0, 0), 0);
 
         //this.ballSpeed = ballSpeed;
     }
@@ -484,8 +484,7 @@ class Level {
 }
 
 
-
-class Controller{
+class Controller {
     mouse;
     raycaster = new THREE.Raycaster();
     onMouseClick;
@@ -494,10 +493,10 @@ class Controller{
 
     constructor(camera) {
         this.camera = camera;
-        this.mouse = new THREE.Vector2(0,0);
+        this.mouse = new THREE.Vector2(0, 0);
     }
 
-    registerListeners(){
+    registerListeners() {
         window.addEventListener("mousemove", this.onMouseMove);
     }
 
@@ -507,7 +506,7 @@ class Controller{
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
-    setOnMouseClick(func){
+    setOnMouseClick(func) {
         this.onMouseClick = func;
         window.addEventListener("click", this.onMouseClick);
 
