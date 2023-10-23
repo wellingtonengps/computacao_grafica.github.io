@@ -242,7 +242,7 @@ function renderTiles() {
         let row = [];
         for (let j = 0; j < rowSize; j++) {
             let tile = new Tile(tileWidth, tileHeight, 0.5, tileWallStartX + tileWidth / 2 + j * tileWidth, tileWallStarty + tileHeight / 2 + i * tileHeight, 0, generateColor())
-            tile.setOnCollide(incrementCollisionCount)
+            tile.setOnDestroy(incrementCollisionCount)
             tile.scene = scene;
             scene.add(tile.getObject() );
             //scene.add(tile.getHelper());

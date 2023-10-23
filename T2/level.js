@@ -12,6 +12,7 @@ import {CollisionManager} from "./collisionManager.js";
 import {generateColor, getColumns, getColumnsRows, getRows, lerArquivoJSON} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 import {GameState} from "./gameState.js";
+
 //import scene from "../build/jsm/offscreen/scene";
 
 class Level {
@@ -34,6 +35,8 @@ class Level {
     raycaster = new THREE.Raycaster()
     controller;
     updates = []
+    ballVector = []
+    _ballSpeed = 0;
 
     constructor(scene) {
         this.scene = scene;
@@ -85,6 +88,19 @@ class Level {
     }
 
 
+    get ballSpeed() {
+        return this._ballSpeed;
+    }
+
+    set ballSpeed(value) {
+        this._ballSpeed = value;
+        this.ball.setMovement(this.ball.movementDirection, this._ballSpeed);
+    }
+
+    shootBall(direction){
+        this.ball.movementDirection = direction;
+    }
+
     get camera() {
         return this._camera;
     }
@@ -117,25 +133,42 @@ class Level {
        }
    }
 
-    incrementCollisionCount(value){
-        this.hits = this.hits + value;
+    incrementDestroyedTileCount(object){
+        this.hits = this.hits + 1;
         console.log(this.hits)
+        let tileWidth = 0.75;
+        let tileHeight = 0.40;
+
+        if(this.hits === 2){
+            let pos = object.getPosition()
+            let tile = new PowerUpTile(tileWidth, tileHeight, 0.5,  pos.x , pos.y, 0, generateColor(), 1)
+            tile.onCollect = this.powerUp.bind(this);
+            tile.scene = this.scene;
+            this.scene.add(tile.getObject());
+            this.updates.push(tile);
+            this.collisionManager.registerCollidable(tile);
+            this.collisionManager.registerCollider(tile);
+        }
     }
 
-    powerUp(){
+    powerUp(object){
+
+       console.log("Collected")
         let sphereRadius = 0.2;
         this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
         let baseHeight = 0.5;
         let baseWidth = 2.0;
+        let pos = object.getPosition();
       //  this.ball = ball;
        // GameState.ballId = this.ball.id;
-        let ball = new Ball(sphereRadius, this.baseStartPos.x, this.baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
-
+        let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
+        ball.setMovement(new THREE.Vector3(0,1,0), this.ball.movementSpeed);
         ball.scene = this.scene;
+        this.ballVector.push(ball);
         this.scene.add(ball.getObject());
 
         // movimento inicial
-        ball.setMovement(new THREE.Vector3(0.2,0.2,0), 0);
+        //ball.setMovement(new THREE.Vector3(0.2,0.2,0), 0);
 
         //register collidable
         this.collisionManager.registerCollider(ball)
@@ -166,7 +199,6 @@ class Level {
         //let offsety = 0.5;
 
 
-
         for (let i = 0; i < numRows; i++) {
             let row = [];
             for (let j = 0; j < rowSize; j++) {
@@ -176,7 +208,7 @@ class Level {
                 if(matrix[i][j] >= 1) {
                     //todo: mudei aqui para inverter
                     let tile = new Tile(tileWidth, tileHeight, 0.5, tileX , tileY, 0, generateColor(), matrix[i][j])
-                    tile.setOnCollide(this.incrementCollisionCount.bind(this))
+                    tile.setOnDestroy(this.incrementDestroyedTileCount.bind(this))
                     tile.scene = this.scene;
                     row.push(tile);
                     this.collisionManager.registerCollidable(tile);
@@ -212,6 +244,11 @@ class Level {
         for(let i=0; i< this.updates.length; i++){
             this.updates[i].update();
         }
+        for(let i=0; i< this.ballVector.length; i++){
+            this.ballVector[i].update();
+        }
+        this.base.update();
+        this.ball.update();
     }
 
     getTotalTiles(){

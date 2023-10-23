@@ -171,7 +171,7 @@ class Tile extends Component {
 
     active = true;
     _hits = 0;
-    _onCollide = null;
+    _onDestroy = null;
 
     constructor(width, height, depth, x, y, z, color, maxHits=1) {
         super();
@@ -225,8 +225,8 @@ class Tile extends Component {
         super.update();
     }
 
-    setOnCollide(func){
-        this._onCollide  = func;
+    setOnDestroy(func){
+        this._onDestroy  = func;
     }
 
     collide(object) {
@@ -239,15 +239,14 @@ class Tile extends Component {
             if(this.hits ==this.maxHits){
                 this.active = false;
                 this.object.visible = false;
+
+                if(this._onDestroy != null){
+                    this._onDestroy(this);
+                }
             }
             else{
                 this.getObject().material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
             }
-
-            if(this._onCollide != null){
-                this._onCollide(this._hits);
-            }
-
 
         }
     }
@@ -504,6 +503,8 @@ class Base extends Component{
 
 class PowerUpTile extends Tile{
 
+    _onCollect;
+
     constructor(width, height, depth, x, y, z, color, maxHits=1) {
         super();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
@@ -521,15 +522,27 @@ class PowerUpTile extends Tile{
         box.castShadow = true;
         this.maxHits = maxHits;
         this.fallSpeed = 0.1;
+        this.active = false;
+        this.collected = false;
+
+    }
+
+
+    get onCollect() {
+        return this._onCollect;
+    }
+
+    set onCollect(value) {
+        this._onCollect = value;
     }
 
     update() {
         super.update();
 
-        if(this._hits>=1){
+       // if(this._hits>=1){
             let pos = this.getPosition();
             this.setPosition(pos.x, pos.y - this.fallSpeed, pos.z);
-        }
+       // }
 
         if(this.getPosition().y <= 0){
             this.destroyTile()
@@ -547,21 +560,26 @@ class PowerUpTile extends Tile{
 
     collide(object) {
 
-        if(this.active===true ){
-            //super.collide(object);
-            if(object.id === GameState.ballId && this.hits === 0){
+      if(this.active===true ){
+           /* if(object.id === GameState.ballId && this.hits === 0){
                 this._hits++;
                 this.active = false;
 
-            }
-            /*if(this._onCollide != null){
-                this._onCollide()
             }*/
+
+
         }
-        if(object.id === GameState.baseId){
+
+        if(object.id === GameState.baseId && !this.collected){
             console.log("Bateu na baseeeee")
+            this.collected = true;
+
+            if(this.onCollect !== null){
+                this.onCollect(this);
+            }
             this.destroyTile();
         }
+
 
     }
 

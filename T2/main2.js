@@ -80,7 +80,7 @@ function onMouseMove(event) {
 
 function onMouseClick(event){
     if(event.button === 0 && gameStarted === false){
-        level.ball.setMovement(new THREE.Vector3(0,1,0), ballSpeed)
+        level.shootBall(new THREE.Vector3(0,1,0))
         startGame(true);
         startSpeedTimer();
     }
@@ -135,7 +135,9 @@ function checkGameOver(){
         startGame(false);
         let basePosition = level.base.getPosition();
         level.ball.setPosition(basePosition.x, basePosition.y + 0.01 + level.base.height / 2 + level.ball.radius, 0);
-        level.ball.movementSpeed = 0;
+        level.ballSpeed = ballSpeed;
+        window.clearInterval(timer)
+
     }
 }
 
@@ -232,16 +234,17 @@ function render() {
 
     if(!gameStarted){
         moveBaseToRaycasterXPosition();
-        level.base.update();
         sphereFollowBase()
-        level.ball.update();
+        //level.base.update();
+        //level.ball.update();
+        level.updateObjects()
 
 
     }else if(!gamePaused){
         moveBaseToRaycasterXPosition();
-        level.base.update();
-        level.ball.setMovement(level.ball.movementDirection, ballSpeed)
-        level.ball.update();
+        //level.base.update();
+        level.ballSpeed = ballSpeed;
+        //level.ball.update();
         level.collisionManager.checkCollisions();
         level.updateObjects();
         checkGameOver();
