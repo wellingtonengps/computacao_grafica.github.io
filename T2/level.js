@@ -9,7 +9,7 @@ import {
 import KeyboardState from "../libs/util/KeyboardState.js";
 import {Ball, Base, Wall, Tile, PowerUpTile} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
-import {generateColor, getColumns, getColumnsRows, getRows, lerArquivoJSON} from "./utils.js";
+import {generateColor, getColumns, getColumnsRows, getRows, getTotalTails, lerArquivoJSON} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 import {GameState} from "./gameState.js";
 
@@ -28,7 +28,7 @@ class Level {
 
     ball;
     base;
-    totalTiles = 0;
+    totalTiles;
     tileMatrix = [];
     _camera;
     collisionManager = new CollisionManager();
@@ -217,7 +217,6 @@ class Level {
                     tile.scene = this.scene;
                     row.push(tile);
                     this.collisionManager.registerCollidable(tile);
-                    this.totalTiles++;
                 }else if(matrix[i][j] === 0){
                     row.push(null);
                 } /*else if(matrix[i][j] === -1){
@@ -289,7 +288,7 @@ class Level {
         let tileHeight = 0.40;
         this.rowSize = getColumns(matrix);
         this.numRows = getRows(matrix);
-
+        this.totalTiles = getTotalTails(matrix);
 
 
         this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);

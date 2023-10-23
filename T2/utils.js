@@ -46,6 +46,20 @@ function getRows(matrix){
     return matrix.length;
 }
 
+function getTotalTails(matrix) {
+    let contador = 0;
+
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+            if (matrix[i][j] !== 0) {
+                contador++;
+            }
+        }
+    }
+
+    return contador;
+}
+
 function lerArquivoJSON(caminho, nivel, callback) {
     fetch(caminho)
         .then(response => response.json())
@@ -70,4 +84,4 @@ function obterMatrizPeloNivel(nivelDesejado) {
     callback(jsonData);
 }
 
-export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON, getColumns, getRows, getColor}
+export {generateColor, getColumnsRows, obterMatrizPeloNivel, lerArquivoJSON, getColumns, getRows, getColor, getTotalTails}
