@@ -87,18 +87,20 @@ class Level {
             this.scene.add(dirLight);
     }
 
-
     get ballSpeed() {
         return this._ballSpeed;
     }
 
     set ballSpeed(value) {
         this._ballSpeed = value;
-        this.ball.setMovement(this.ball.movementDirection, this._ballSpeed);
+        for(let i=0; i< this.ballVector.length; i++){
+            this.ballVector[i].movementSpeed = this._ballSpeed;
+        }
     }
 
     shootBall(direction){
-        this.ball.movementDirection = direction;
+        this.ballVector[0].setMovement(direction, this._ballSpeed);
+
     }
 
     get camera() {
@@ -118,7 +120,6 @@ class Level {
             }
         }
     }*/
-
 
    resetTiles(numRows, rowSize){
        for (let i = 0; i < numRows; i++) {
@@ -154,24 +155,27 @@ class Level {
     powerUp(object){
 
        console.log("Collected")
-        let sphereRadius = 0.2;
-        this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
-        let baseHeight = 0.5;
-        let baseWidth = 2.0;
-        let pos = object.getPosition();
-      //  this.ball = ball;
-       // GameState.ballId = this.ball.id;
-        let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
-        ball.setMovement(new THREE.Vector3(0,1,0), this.ball.movementSpeed);
-        ball.scene = this.scene;
-        this.ballVector.push(ball);
-        this.scene.add(ball.getObject());
+        if(this.ballVector.length ===1){
+            let sphereRadius = 0.2;
+            this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
+            let baseHeight = 0.5;
+            let baseWidth = 2.0;
+            let pos = object.getPosition();
+            //  this.ball = ball;
+            // GameState.ballId = this.ball.id;
+            let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
+            ball.setMovement(new THREE.Vector3(0,1,0), this.ball.movementSpeed);
+            ball.scene = this.scene;
+            this.ballVector.push(ball);
+            this.scene.add(ball.getObject());
 
-        // movimento inicial
-        //ball.setMovement(new THREE.Vector3(0.2,0.2,0), 0);
+            // movimento inicial
+            //ball.setMovement(new THREE.Vector3(0.2,0.2,0), 0);
 
-        //register collidable
-        this.collisionManager.registerCollider(ball)
+            //register collidable
+            this.collisionManager.registerCollider(ball)
+        }
+
     }
 
     /*
@@ -244,11 +248,22 @@ class Level {
         for(let i=0; i< this.updates.length; i++){
             this.updates[i].update();
         }
+
         for(let i=0; i< this.ballVector.length; i++){
             this.ballVector[i].update();
+
+            //verifica se alguma bola foi perdida. Se sim, deleta da lista e destrói
+            if(this.ballVector[i].getPosition().y <= 0){
+                this.ballVector[i].deleteObject();
+                this.ballVector.splice(i, 1);
+            }
+        }
+
+        if(this.ballVector.length === 0){
+            this.onGameOver();
         }
         this.base.update();
-        this.ball.update();
+        //this.ball.update();
     }
 
     getTotalTiles(){
@@ -269,6 +284,12 @@ class Level {
 
         this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
         this.resetTiles(this.numRows, this.rowSize);
+    }
+
+    sphereFollowBase(){
+        let posVector = this.base.getPosition();
+        this.ballVector[0].setPosition(posVector.x, posVector.y +  this.base.height/2 + this.ball.radius + 0.01, 0.0)
+        this.ballVector[0].update()
     }
 
     initGameScene(){
@@ -301,6 +322,7 @@ class Level {
         ball.scene = this.scene;
         this.scene.add(ball.getObject());
         this.scene.add(base.getHelper())
+        this.ballVector.push(ball)
 
         // movimento inicial
         ball.setMovement(new THREE.Vector3(0,0,0), 0);
@@ -397,7 +419,36 @@ class Level {
         return this._countTiles;
     }
 
+    setOnGameOver(func){
+        this.onGameOver = func;
+    }
+
+    resetBall(){
+        let baseHeight = 0.5;
+        let baseWidth = 2.0;
+        let sphereRadius = 0.2;
+
+        for(let i=0; i< this.ballVector.length; i++){
+            this.ballVector[i].getObject().geometry.dispose();
+            this.ballVector[i].getObject().material.dispose();
+            this.ballVector[i].getObject().visible =false;
+            this.ballVector[i].getObject().active =false;
+        }
+        this.ballVector = []
+        let basePosition = this.base.getPosition();
+        let ball = new Ball(sphereRadius, basePosition.x, basePosition.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
+        this.scene.add(ball.getObject());
+        this.ballVector.push(ball);
+        this.collisionManager.registerCollider(ball);
+
+        //this.ballVector[0].setPosition(basePosition.x, basePosition.y + 0.01 + this.base.height / 2 + this.ball.radius, 0);
+        this.ballVector[0].setMovement(new THREE.Vector3(0,0,0), 0);
+
+        //this.ballSpeed = ballSpeed;
+    }
+
     restartLevel() {
+
         this.base.setPosition(this.baseStartPos.x, this.baseStartPos.y, this.baseStartPos.z);
         this.ball.setPosition(this.baseStartPos.x, this.baseStartPos.y + 0.01 + this.base.height / 2 + this.ball.radius, 0);
         this.ball.movementSpeed = 0;

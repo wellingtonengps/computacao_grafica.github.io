@@ -129,16 +129,23 @@ function checkWinGame() {
 
 function checkGameOver(){
 
-    let ballPosition = level.ball.getPosition()
+    //let ballPosition = level.ball.getPosition()
 
     if(ballPosition.y <= 0){
         startGame(false);
-        let basePosition = level.base.getPosition();
+        /*let basePosition = level.base.getPosition();
         level.ball.setPosition(basePosition.x, basePosition.y + 0.01 + level.base.height / 2 + level.ball.radius, 0);
-        level.ballSpeed = ballSpeed;
+        level.ballSpeed = ballSpeed;*/
+        level.resetBall();
         window.clearInterval(timer)
 
     }
+}
+
+function gameOver(){
+    startGame(false);
+    level.resetBall();
+    window.clearInterval(timer)
 }
 
 function pauseGame(status){
@@ -185,9 +192,10 @@ function moveBaseToRaycasterXPosition() {
 }
 
 function sphereFollowBase(){
-    let posVector = level.base.getPosition();
+    /*let posVector = level.base.getPosition();
     level.ball.setPosition(posVector.x, posVector.y +  level.base.height/2 + level.ball.radius + 0.01, 0.0)
-    level.ball.update()
+    level.ball.update()*/
+    level.sphereFollowBase();
 }
 
 
@@ -220,6 +228,7 @@ function initLevel(levelNumber) {
     level.createBackgroundPlane(scene);
     level.initCamera(scene);
     level.initLight(scene);
+    level.setOnGameOver(gameOver.bind(this))
     onWindowResize(level.camera, renderer);
 }
 
@@ -247,7 +256,7 @@ function render() {
         //level.ball.update();
         level.collisionManager.checkCollisions();
         level.updateObjects();
-        checkGameOver();
+        //checkGameOver();
         checkWinGame();
     }
 

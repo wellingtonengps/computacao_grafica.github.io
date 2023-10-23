@@ -132,6 +132,13 @@ class Component {
         return pos;
     }
 
+    deleteObject(){
+        this.object.geometry.dispose();
+        this.object.material.dispose();
+        this.object.visible =false;
+        this.object.active =false;
+    }
+
     getSurfaceNormalByPoint(point){}
 }
 
@@ -231,7 +238,7 @@ class Tile extends Component {
 
     collide(object) {
         //console.log(this.active)
-        if(this.active===true && object.id === GameState.ballId ){
+        if(this.active===true && object instanceof Ball){
 
             super.collide(object);
             this.hits++;
