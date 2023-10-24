@@ -22,7 +22,7 @@ renderer.shadowMap.type = THREE.VSMShadowMap;
 let level;
 let mouse = new THREE.Vector2();
 let levelNumber= 1;
-let initialBallSpeed = 0.05;
+let initialBallSpeed = 0.1;
 let ballSpeed = initialBallSpeed;
 
 var infoBox = new SecondaryBox();
@@ -42,13 +42,13 @@ let timer;
 function startSpeedTimer(){
     timer = window.setInterval((e)=>{
         if(ballSpeed <=0.2){
-            ballSpeed += 0.0013
+            ballSpeed += 0.0067;
         }else{
             ballSpeed = 0.2
             window.clearInterval(timer)
         }
 
-    }, 100);
+    }, 1000);
 }
 
 
