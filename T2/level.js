@@ -143,7 +143,7 @@ class Level {
             let sphereRadius = 0.2;
             this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
             let baseHeight = 0.5;
-            let pos = object.getPosition();
+            let pos = this.ballVector[0].getPosition();
             let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
             ball.setMovement(new THREE.Vector3(0, 1, 0), this.ball.movementSpeed);
             ball.scene = this.scene;
