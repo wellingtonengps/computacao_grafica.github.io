@@ -83,7 +83,7 @@ function createScene()
 
 
 function createCSGBase(width, height, depth){
-  let mat = new THREE.MeshPhongMaterial({color: 'red', shininess:500});
+  let mat = new THREE.MeshLambertMaterial({color: 'red'});
   let cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(width, width, depth))
   let cylinderMesh = new THREE.Mesh( new THREE.CylinderGeometry(width/2, width/2, depth, 20))
 
@@ -102,7 +102,7 @@ function createCSGBase(width, height, depth){
   let csgBase = outerCyCSG.subtract(cubeCSG)
 
   let base = CSG.toMesh(csgBase, new THREE.Matrix4())
-  base.material = new THREE.MeshPhongMaterial({color: 'yellow', shininess:500})
+  base.material = new THREE.MeshLambertMaterial({color: 'yellow'})
   //base.position.set(1, 10, 0)
   //this.base.object = base;
   // scene.add(base)

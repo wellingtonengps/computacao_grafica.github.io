@@ -39,7 +39,7 @@ class Component {
         raycaster.set(this.getPosition(), direction);
         let intersects = raycaster.intersectObject(object.getObject());
 
-        if (this.scene) {
+        /*if (this.scene) {
             const material = new THREE.LineBasicMaterial({
                 color: "rgb(255,255,255)",
                 linewidth: 2
@@ -55,7 +55,7 @@ class Component {
 
             const line = new THREE.Line(geometry, material);
             this._scene.add(line);
-        }
+        }*/
 
         if (intersects.length === 0) {
             return new THREE.Vector3(0, 0, 0)
@@ -167,7 +167,7 @@ class Tile extends Component {
     constructor(width, height, depth, x, y, z, color, maxHits = 1) {
         super();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
-        let material = new THREE.MeshPhongMaterial({color: getColor(maxHits)})
+        let material = new THREE.MeshLambertMaterial({color: getColor(maxHits)})
         let box = new THREE.Mesh(boxGeometry, material);
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
@@ -263,7 +263,7 @@ class Ball extends Component {
 
     constructor(radius, x, y, z) {
         super();
-        let material = setDefaultMaterial();
+        let material = new THREE.MeshPhongMaterial({color: 'red', shininess: 200});
         let sphereGeometry = new THREE.SphereGeometry(radius, 32, 16);
         let sphereBox = new THREE.Mesh(sphereGeometry, material);
         let bbSphere = new THREE.Box3().setFromObject(sphereBox);
