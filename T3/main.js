@@ -205,6 +205,19 @@ function sphereFollowBase(){
 
 function initLevel(levelNumber) {
     scene = new THREE.Scene();
+    const path = '../assets/textures/cube/Park/';
+    const format = '.jpg';
+    const urls = [
+        path + 'posx' + format, path + 'negx' + format,
+        path + 'posy' + format, path + 'negy' + format,
+        path + 'posz' + format, path + 'negz' + format
+    ];
+// Setting the two cube maps, one for refraction and one for reflection
+    let cubeMapTexture = new THREE.CubeTextureLoader().load( urls );
+
+// Create the main scene and Set its background as a cubemap (using a CubeTexture)
+    scene.background = cubeMapTexture;
+
 
     level = new Level(scene);
 
