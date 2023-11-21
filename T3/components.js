@@ -169,9 +169,11 @@ class Tile extends Component {
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
         let material = new THREE.MeshLambertMaterial({color: getColor(maxHits)})
         let box = new THREE.Mesh(boxGeometry, material);
+
         if(maxHits == 2){
             let textureLoader = new THREE.TextureLoader();
-            let floor  = textureLoader.load('../assets/textures/stone.jpg');
+            let floor  = textureLoader.load('assets/textures/stripes.png');
+            box.material = new THREE.MeshLambertMaterial({color: "white"})
             box.material.map = floor;
         }
 
