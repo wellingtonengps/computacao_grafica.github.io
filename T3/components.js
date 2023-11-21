@@ -177,7 +177,6 @@ class Tile extends Component {
             box.material.map = floor;
         }
 
-
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
         bbBox.setFromObject(box);
@@ -243,7 +242,7 @@ class Tile extends Component {
                     this._onDestroy(this);
                 }
             } else {
-                this.getObject().material = new THREE.MeshBasicMaterial({color: 0xffffff});
+                this.getObject().material = new THREE.MeshLambertMaterial({color: 0xffffff});
             }
 
         }
