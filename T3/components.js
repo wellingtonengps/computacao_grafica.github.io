@@ -5,6 +5,7 @@ import {CSG} from "../libs/other/CSGMesh.js";
 import {getColor} from "./utils.js";
 
 
+
 let material = setDefaultMaterial();
 
 class Component {
@@ -170,12 +171,35 @@ class Tile extends Component {
         let material = new THREE.MeshLambertMaterial({color: getColor(maxHits)})
         let box = new THREE.Mesh(boxGeometry, material);
 
+        let listener = new THREE.AudioListener();
+        box.add( listener );
+        let sound = new THREE.Audio( listener );
+        let audioLoader = new THREE.AudioLoader();
+
+
         if(maxHits == 2){
             let textureLoader = new THREE.TextureLoader();
-            let floor  = textureLoader.load('assets/textures/stripes.png');
-            box.material = new THREE.MeshLambertMaterial({color: "white"})
+            let floor  = textureLoader.load('../assets/textures/stone.jpg');
             box.material.map = floor;
+
+            audioLoader.load( 'assets/sounds/bloco2.mp3', function( buffer ) {
+                sound.setBuffer( buffer );
+                sound.setLoop( false );
+                sound.setVolume( 0.5 );
+                //sound.play();
+            });
+        }else{
+            audioLoader.load( 'assets/sounds/bloco1.mp3', function( buffer ) {
+                sound.setBuffer( buffer );
+                sound.setLoop( false );
+                sound.setVolume( 0.5 );
+                //sound.play();
+            });
         }
+
+
+
+        this.effectSound = sound;
 
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
@@ -198,6 +222,13 @@ class Tile extends Component {
         if (maxHits > 2) {
             this.maxHits = 1;
         }
+
+
+
+    }
+
+    getEffectSound() {
+        return this.effectSoundBloco1;
     }
 
     getHelper() {
@@ -234,19 +265,22 @@ class Tile extends Component {
             super.collide(object);
             this.hits++;
 
+
             if (this.hits === this.maxHits) {
                 this.active = false;
                 this.object.visible = false;
+                this.effectSound.play();
 
                 if (this._onDestroy != null) {
                     this._onDestroy(this);
                 }
             } else {
-                this.getObject().material = new THREE.MeshLambertMaterial({color: 0xffffff});
+                this.getObject().material = new THREE.MeshBasicMaterial({color: 0xffffff});
             }
 
         }
     }
+
 
     getSurfaceNormalByPoint(point) {
         let relativeX = point.x - this.getPosition().x + this.width / 2;
@@ -342,6 +376,7 @@ class Ball extends Component {
 
     collide(object) {
         if (object.active && this.lastCollided != object.id) {
+            this.getObject();
             super.collide(object);
         }
     }

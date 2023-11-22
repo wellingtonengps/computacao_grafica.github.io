@@ -15,7 +15,6 @@ var keyboard = new KeyboardState();
 let scene; // Create main scene
 let renderer = initRenderer();
 
-
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.VSMShadowMap;
 
@@ -54,7 +53,7 @@ function startSpeedTimer(){
 
 function onWindowResize(camera, renderer, frustumSize = 16) {
     let w = window.innerWidth;
-    let h = window.innerHeight
+    let h = window.innerHeight;
     let aspect = w / h;
     let f = frustumSize;
     if (camera instanceof THREE.PerspectiveCamera) {
@@ -110,8 +109,6 @@ function keyboardUpdate() {
 
 }
 
-
-
 function restartGame() {
     startGame(false);
     initLevel(levelNumber);
@@ -126,7 +123,6 @@ function checkWinGame() {
 }
 
 function checkGameOver(){
-
     //let ballPosition = level.ball.getPosition()
 
     if(ballPosition.y <= 0){
@@ -136,7 +132,6 @@ function checkGameOver(){
         level.ballSpeed = ballSpeed;*/
         level.resetBall();
         window.clearInterval(timer)
-
     }
 }
 

@@ -208,18 +208,6 @@ function initLevel(levelNumber) {
 
     level = new Level(scene);
 
-    /*
-    const matrix = [
-        [1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 0, 0, 0, 0, 0],
-        [1, 1, 1, 0, 0, 0, 0],
-        [1, 1, 1, 1, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1]
-    ];*/
-
-    //let matrix = obterMatrizPeloNivel(0)
-
-
     readLevel("levels.json", levelNumber, (data) => {
         let matrix = [];
         matrix = data;
