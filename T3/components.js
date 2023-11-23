@@ -179,8 +179,9 @@ class Tile extends Component {
 
         if(maxHits == 2){
             let textureLoader = new THREE.TextureLoader();
-            let floor  = textureLoader.load('../assets/textures/stone.jpg');
-            box.material.map = floor;
+            let texture  = textureLoader.load('assets/textures/stripes.png');
+            box.material = new THREE.MeshLambertMaterial({color: "white"});
+            box.material.map = texture;
 
             audioLoader.load( 'assets/sounds/bloco2.mp3', function( buffer ) {
                 sound.setBuffer( buffer );
@@ -275,7 +276,7 @@ class Tile extends Component {
                     this._onDestroy(this);
                 }
             } else {
-                this.getObject().material = new THREE.MeshBasicMaterial({color: 0xffffff});
+                this.getObject().material = new THREE.MeshLambertMaterial({color: 0xffffff});
             }
 
         }
