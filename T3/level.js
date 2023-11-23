@@ -118,12 +118,12 @@ class Level {
         let tileHeight = 0.40;
 
 
-        if (this.ballVector.length === 1) {
+        if (this.ballVector.length <= 2) {
             this.blockBeforePowerUp++;
             console.log("blockBeforePowerUp: " + this.blockBeforePowerUp)
         }
 
-        if (this.blockBeforePowerUp === 10 && this.ballVector.length === 1) {
+        if (this.blockBeforePowerUp === 10 && this.ballVector.length <= 2) {
             this.blockBeforePowerUp = 0;
             let pos = object.getPosition()
             let tile = new PowerUpTile(tileWidth, tileHeight, 0.5, pos.x, pos.y, 0, generateColor(), 1)
@@ -137,19 +137,24 @@ class Level {
         }
     }
 
+    addBall(){
+        let sphereRadius = 0.2;
+        this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
+        let baseHeight = 0.5;
+        let pos = this.ballVector[0].getPosition();
+        let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
+        ball.setMovement(new THREE.Vector3(0, 1, 0), this.ball.movementSpeed);
+        ball.scene = this.scene;
+        this.ballVector.push(ball);
+        this.scene.add(ball.getObject());
+        this.collisionManager.registerCollider(ball)
+    }
+
     powerUp(object) {
 
-        if(this.ballVector.length === 1){
-            let sphereRadius = 0.2;
-            this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
-            let baseHeight = 0.5;
-            let pos = this.ballVector[0].getPosition();
-            let ball = new Ball(sphereRadius, pos.x, pos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
-            ball.setMovement(new THREE.Vector3(0, 1, 0), this.ball.movementSpeed);
-            ball.scene = this.scene;
-            this.ballVector.push(ball);
-            this.scene.add(ball.getObject());
-            this.collisionManager.registerCollider(ball)
+        if(this.ballVector.length <= 2){
+            this.addBall();
+            this.addBall();
         }
 
     }
