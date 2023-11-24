@@ -289,7 +289,7 @@ class Level {
         });
         planeMaterial.side = THREE.DoubleSide;
         planeMaterial.transparent = true;
-        planeMaterial.opacity = 1.0;
+        planeMaterial.opacity = 0.0;
 
         let backgroundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
         backgroundPlane.position.set(4.625, 8, -0.5);

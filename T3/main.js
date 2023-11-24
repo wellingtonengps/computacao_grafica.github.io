@@ -200,12 +200,12 @@ function sphereFollowBase(){
 
 function initLevel(levelNumber) {
     scene = new THREE.Scene();
-    const path = '../assets/textures/cube/Park/';
-    const format = '.jpg';
+    const path = 'assets/textures/cube/Corona/corona';
+    const format = '.png';
     const urls = [
-        path + 'posx' + format, path + 'negx' + format,
-        path + 'posy' + format, path + 'negy' + format,
-        path + 'posz' + format, path + 'negz' + format
+        path + '_ft' + format, path + '_bk' + format,
+        path + '_up' + format, path + '_dn' + format,
+        path + '_rt' + format, path + '_lf' + format
     ];
 // Setting the two cube maps, one for refraction and one for reflection
     let cubeMapTexture = new THREE.CubeTextureLoader().load( urls );
