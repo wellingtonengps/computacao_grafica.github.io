@@ -1,12 +1,16 @@
 import * as THREE from "three";
 import {
+    getFilename, getMaxSize,
     SecondaryBox,
 } from "../libs/util/util.js";
 import {Ball, Base, Wall, Tile, PowerUpTile} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
-import {generateColor, getColumns, getRows, getTotalTails} from "./utils.js";
+import {generateColor, getColumns, getRows, getTotalTails, loadGLTFFile} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 import {GameState} from "./gameState.js";
+import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
+import {OBJLoader} from '../build/jsm/loaders/OBJLoader.js';
+import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 
 
 class Level {
@@ -32,6 +36,7 @@ class Level {
     constructor(scene) {
         this.scene = scene;
         this.hits = 0;
+
     }
 
     initCamera() {
@@ -47,6 +52,8 @@ class Level {
         camera.lookAt(4.625, 8, 0);
         camera.updateProjectionMatrix();
     }
+
+
 
     resetCamera() {
 

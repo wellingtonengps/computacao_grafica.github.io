@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {setDefaultMaterial,} from "../libs/util/util.js";
 import {GameState} from "./gameState.js";
 import {CSG} from "../libs/other/CSGMesh.js";
-import {getColor} from "./utils.js";
+import {getColor, loadGLTFFile} from "./utils.js";
 import {SoundManager} from "./soundManager.js";
 
 
@@ -408,6 +408,7 @@ class Base extends Component {
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
         base.castShadow = true
         this.soundEffect = SoundManager.createSound(base, 'assets/sounds/rebatedor.mp3')
+        loadGLTFFile('assets/objects/','UFO_Empty', 1.5, 180, true, base);
 
         /*base2.position.set(x, y, z);
         this.object = base2;*/
