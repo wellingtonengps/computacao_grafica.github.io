@@ -7,6 +7,7 @@ import KeyboardState from "../libs/util/KeyboardState.js";
 import {Level} from "./level.js";
 
 import {readLevel} from "./utils.js";
+import {OrbitControls} from "../build/jsm/controls/OrbitControls.js";
 
 // Initial variables
 let gamePaused = false;
@@ -14,6 +15,7 @@ let gameStarted = false;
 var keyboard = new KeyboardState();
 let scene; // Create main scene
 let renderer = initRenderer();
+let orbitControls;
 
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.VSMShadowMap;
@@ -105,6 +107,11 @@ function keyboardUpdate() {
     }
     else if(keyboard.down("G")){
         nextLevel();
+    }
+    else if(keyboard.down("O")){
+        level.resetCamera();
+        orbitControls.enabled = !orbitControls.enabled;
+
     }
 
 }
@@ -242,7 +249,12 @@ function initLevel(levelNumber) {
     level.setOnGameOver(gameOver.bind(this));
     level.setOnWinGame(winGame.bind(this));
 
+    orbitControls = new OrbitControls(level.camera, renderer.domElement );
+    orbitControls.target = new THREE.Vector3(4.625, 8, 0);
+    orbitControls.update()
+    orbitControls.enabled = false;
     onWindowResize(level.camera, renderer);
+
 }
 
 
