@@ -3,6 +3,7 @@ import {setDefaultMaterial,} from "../libs/util/util.js";
 import {GameState} from "./gameState.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 import {getColor} from "./utils.js";
+import {SoundManager} from "./soundManager.js";
 
 
 
@@ -183,24 +184,13 @@ class Tile extends Component {
             box.material = new THREE.MeshLambertMaterial({color: "white"});
             box.material.map = texture;
 
-            audioLoader.load( 'assets/sounds/bloco2.mp3', function( buffer ) {
-                sound.setBuffer( buffer );
-                sound.setLoop( false );
-                sound.setVolume( 0.5 );
-                //sound.play();
-            });
+           this.soundEffect = SoundManager.createSound(box, 'assets/sounds/bloco2.mp3')
+
         }else{
-            audioLoader.load( 'assets/sounds/bloco1.mp3', function( buffer ) {
-                sound.setBuffer( buffer );
-                sound.setLoop( false );
-                sound.setVolume( 0.5 );
-                //sound.play();
-            });
+            this.soundEffect = SoundManager.createSound(box, 'assets/sounds/bloco1.mp3')
+
         }
 
-
-
-        this.effectSound = sound;
 
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
@@ -265,12 +255,12 @@ class Tile extends Component {
 
             super.collide(object);
             this.hits++;
-
+            this.soundEffect.play();
 
             if (this.hits === this.maxHits) {
                 this.active = false;
                 this.object.visible = false;
-                this.effectSound.play();
+
 
                 if (this._onDestroy != null) {
                     this._onDestroy(this);
@@ -417,6 +407,8 @@ class Base extends Component {
         this.surfaceNormal = new THREE.Vector3(0, 1, 0);
         this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
         base.castShadow = true
+        this.soundEffect = SoundManager.createSound(base, 'assets/sounds/rebatedor.mp3')
+
         /*base2.position.set(x, y, z);
         this.object = base2;*/
     }
@@ -428,6 +420,8 @@ class Base extends Component {
 
     collide(object) {
         super.collide(object);
+        this.soundEffect.stop();
+        this.soundEffect.play();
     }
 
     getHelper() {
