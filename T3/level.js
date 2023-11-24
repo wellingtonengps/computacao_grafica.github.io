@@ -152,7 +152,9 @@ class Level {
 
     powerUp(object) {
 
-        if(this.ballVector.length <= 2){
+        if(this.ballVector.length === 2){
+            this.addBall();
+        }else if(this.ballVector.length===1){
             this.addBall();
             this.addBall();
         }
