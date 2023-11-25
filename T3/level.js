@@ -136,7 +136,7 @@ class Level {
         console.log(this.hits)
         let tileWidth = 0.75;
         let tileHeight = 0.40;
-
+        let rand =  Math.floor(Math.random() * 2);
 
         if (this.ballVector.length <= 2) {
             this.blockBeforePowerUp++;
@@ -146,8 +146,16 @@ class Level {
         if (this.blockBeforePowerUp === 10 && this.ballVector.length <= 2) {
             this.blockBeforePowerUp = 0;
             let pos = object.getPosition()
-            let tile = new PowerUpTile(tileWidth, tileHeight, 0.5, pos.x, pos.y, 0, generateColor(), 1)
-            tile.onCollect = this.powerUp.bind(this);
+            let tile ;
+
+            if(rand === 0){
+                tile = new PowerUpTile(tileWidth/2, tileHeight/2, 0.5, pos.x, pos.y, 0, generateColor(), 0)
+                tile.onCollect = this.powerUpI.bind(this);
+            }else if (rand === 1){
+                tile = new PowerUpTile(tileWidth/2, tileHeight/2, 0.5, pos.x, pos.y, 0, generateColor(), 1)
+                tile.onCollect = this.powerUpII.bind(this);
+            }
+
             tile.scene = this.scene;
             this.scene.add(tile.getObject());
             this.updates.push(tile);
@@ -170,10 +178,11 @@ class Level {
         this.collisionManager.registerCollider(ball)
     }
 
-    powerUp(object) {
-        let rand =  Math.floor(Math.random() * 2);
+    powerUpI(object) {
+       // let rand =  Math.floor(Math.random() * 2);
+        object.deleteObject();
 
-        if(rand ===0){
+       // if(rand ===0){
             if(this.ballVector.length === 2){
                 this.addBall();
             }else if(this.ballVector.length===1){
@@ -181,18 +190,23 @@ class Level {
                 this.addBall();
             }
 
-        }else{
-            while(this.ballVector.length > 1){
-                this.ballVector.pop().deleteObject();
-            }
+       // }else{
 
-            this.ballVector[0].state = Ball.STATE_UNSTOPPABLE;
-            this.timer = window.setInterval((e)=>{
-                this.ballVector[0].state = Ball.STATE_NORMAL;
-                window.clearInterval(this.timer)
-            }, 7000);
+       // }
+
+    }
+
+    powerUpII(object) {
+
+        while(this.ballVector.length > 1){
+            this.ballVector.pop().deleteObject();
         }
 
+        this.ballVector[0].state = Ball.STATE_UNSTOPPABLE;
+        this.timer = window.setInterval((e)=>{
+            this.ballVector[0].state = Ball.STATE_NORMAL;
+            window.clearInterval(this.timer)
+        }, 7000);
     }
 
 

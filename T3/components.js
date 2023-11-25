@@ -499,11 +499,15 @@ class PowerUpTile extends Tile {
 
     _onCollect;
 
-    constructor(width, height, depth, x, y, z, color, maxHits = 1) {
+    constructor(width, height, depth, x, y, z, color, type) {
         super();
+        let textureLoader = new THREE.TextureLoader();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
-        let material = new THREE.MeshLambertMaterial({color: "rgb(0,0,0)"})
-        let box = new THREE.Mesh(boxGeometry, material);
+        let capsuleGeometry = new THREE.CapsuleGeometry(height, width, 16, 16);
+        let texture  = textureLoader.load(type === 0? 'assets/textures/stripes.png':'assets/textures/wood.png');
+        let material = new THREE.MeshLambertMaterial({color: "rgb(255,255,255)"})
+        material.map = texture;
+        let box = new THREE.Mesh(capsuleGeometry, material);
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
         bbBox.setFromObject(box);
@@ -514,7 +518,7 @@ class PowerUpTile extends Tile {
         this.width = width;
         this.height = height;
         box.castShadow = true;
-        this.maxHits = maxHits;
+        //this.maxHits = maxHits;
         this.fallSpeed = 0.1;
         this.active = false;
         this.collected = false;
