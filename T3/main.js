@@ -111,7 +111,6 @@ function keyboardUpdate() {
     else if(keyboard.down("O")){
         level.resetCamera();
         orbitControls.enabled = !orbitControls.enabled;
-
     }
 
 }

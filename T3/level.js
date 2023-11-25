@@ -32,6 +32,12 @@ class Level {
     ballVector = []
     _ballSpeed = 0;
     blockBeforePowerUp = 0;
+    timer;
+
+    startTimer(){
+
+    }
+
 
     constructor(scene) {
         this.scene = scene;
@@ -165,15 +171,30 @@ class Level {
     }
 
     powerUp(object) {
+        let rand =  Math.floor(Math.random() * 2);
 
-        if(this.ballVector.length === 2){
-            this.addBall();
-        }else if(this.ballVector.length===1){
-            this.addBall();
-            this.addBall();
+        if(rand ===0){
+            if(this.ballVector.length === 2){
+                this.addBall();
+            }else if(this.ballVector.length===1){
+                this.addBall();
+                this.addBall();
+            }
+
+        }else{
+            while(this.ballVector.length > 1){
+                this.ballVector.pop().deleteObject();
+            }
+
+            this.ballVector[0].state = Ball.STATE_UNSTOPPABLE;
+            this.timer = window.setInterval((e)=>{
+                this.ballVector[0].state = Ball.STATE_NORMAL;
+                window.clearInterval(this.timer)
+            }, 7000);
         }
 
     }
+
 
     renderTiles(numRows, rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix) {
 

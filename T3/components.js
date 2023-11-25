@@ -7,6 +7,7 @@ import {SoundManager} from "./soundManager.js";
 
 
 
+
 let material = setDefaultMaterial();
 
 class Component {
@@ -293,10 +294,13 @@ class Tile extends Component {
 }
 
 class Ball extends Component {
+    static STATE_NORMAL = 0;
+    static STATE_UNSTOPPABLE = 1;
+    _state = Ball.STATE_NORMAL;
 
     constructor(radius, x, y, z) {
         super();
-        let material = new THREE.MeshPhongMaterial({color: 'red', shininess: 200});
+        let material = new THREE.MeshPhongMaterial({color: 'white', shininess: 200});
         let sphereGeometry = new THREE.SphereGeometry(radius, 32, 16);
         let sphereBox = new THREE.Mesh(sphereGeometry, material);
         let bbSphere = new THREE.Box3().setFromObject(sphereBox);
@@ -318,6 +322,21 @@ class Ball extends Component {
         this.movementSpeed = movementSpeed;
     }
 
+
+    get state() {
+        return this._state;
+    }
+
+    set state(value) {
+
+        if(value === Ball.STATE_NORMAL){
+            this.object.material = new THREE.MeshPhongMaterial({color: 'white', shininess: 200});
+        }else if(value === Ball.STATE_UNSTOPPABLE){
+            this.object.material = new THREE.MeshPhongMaterial({color: 'red', shininess: 200});
+        }
+
+        this._state = value;
+    }
 
     update() {
         super.update();
@@ -358,7 +377,9 @@ class Ball extends Component {
             }
             addedNormalVectors = addedNormalVectors.normalize();
 
-            this.movementDirection = this.movementDirection.reflect(addedNormalVectors);
+            if(this.state !== Ball.STATE_UNSTOPPABLE || !(this.collidedWith[this.collidedWith.length-1] instanceof Tile)) {
+                this.movementDirection = this.movementDirection.reflect(addedNormalVectors);
+            }
 
             this.collidedWith = []
         }
