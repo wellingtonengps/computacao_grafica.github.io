@@ -166,6 +166,9 @@ class Tile extends Component {
     active = true;
     _hits = 0;
     _onDestroy = null;
+    sound1;
+    sound2;
+    sound3;
 
     constructor(width, height, depth, x, y, z, color, maxHits = 1) {
         super();
@@ -177,6 +180,10 @@ class Tile extends Component {
         box.add( listener );
         let sound = new THREE.Audio( listener );
         let audioLoader = new THREE.AudioLoader();
+        this.sound1 = SoundManager.createSound(box, 'assets/sounds/bloco1.mp3')
+        this.sound2 = SoundManager.createSound(box, 'assets/sounds/bloco2.mp3')
+        this.sound3 = SoundManager.createSound(box, 'assets/sounds/bloco3.mp3')
+
 
 
         if(maxHits == 2){
@@ -219,10 +226,28 @@ class Tile extends Component {
 
     }
 
-    getEffectSound() {
-        return this.effectSoundBloco1;
-    }
+    playSoundEffect(object){
 
+        if(object instanceof Ball && object.state === Ball.STATE_UNSTOPPABLE){
+           // SoundManager.play('bloco3')
+            this.sound3.play()
+        }
+
+        else if(this.maxHits ===1){
+
+            //SoundManager.play('bloco1')
+            this.sound1.play()
+
+        }
+
+        else if(this.maxHits ===2){
+            this.sound2.play()
+
+
+            // SoundManager.play('bloco2')
+        }
+
+    }
     getHelper() {
         return this.helper;
     }
@@ -256,8 +281,8 @@ class Tile extends Component {
 
             super.collide(object);
             this.hits++;
-            this.soundEffect.play();
-
+           // this.soundEffect.play();
+            this.playSoundEffect(object);
             if (this.hits === this.maxHits) {
                 this.active = false;
                 this.object.visible = false;

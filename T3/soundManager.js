@@ -2,10 +2,11 @@ import * as THREE from "three";
 
 class SoundManager{
 
+
     static createSound(object, filePath){
 
-        let listener = new THREE.AudioListener();
-        object.add( listener );
+       let listener = new THREE.AudioListener();
+       object.add( listener );
         let sound = new THREE.Audio( listener );
         let audioLoader = new THREE.AudioLoader();
         audioLoader.load( filePath, function( buffer ) {
@@ -17,6 +18,9 @@ class SoundManager{
 
         return sound;
     }
+
+
+
 }
 
 export {SoundManager}

@@ -8,6 +8,7 @@ import {Level} from "./level.js";
 
 import {readLevel} from "./utils.js";
 import {OrbitControls} from "../build/jsm/controls/OrbitControls.js";
+import {SoundManager} from "./soundManager.js";
 
 // Initial variables
 let gamePaused = false;
@@ -253,6 +254,8 @@ function initLevel(levelNumber) {
     orbitControls.update()
     orbitControls.enabled = false;
     onWindowResize(level.camera, renderer);
+
+
 
 }
 
