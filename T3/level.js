@@ -3,7 +3,7 @@ import {
     getFilename, getMaxSize,
     SecondaryBox,
 } from "../libs/util/util.js";
-import {Ball, Base, Wall, Tile, PowerUpTile} from "./components.js";
+import {Ball, Base, Wall, Tile, PowerUpTile, Life} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
 import {generateColor, getColumns, getRows, getTotalTails, loadGLTFFile} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
@@ -23,6 +23,7 @@ class Level {
     base;
     totalTiles;
     tileMatrix = [];
+    lifeVector = [];
     _camera;
     collisionManager = new CollisionManager();
     scene
@@ -209,6 +210,29 @@ class Level {
         }, 7000);
     }
 
+    incrementLife(){
+        let obj = this.lifeVector.pop();
+        obj.visible = false;
+
+        console.log("lifes: " + this.lifeVector.length)
+    }
+
+    renderLife(){
+
+        for (let i = 0; i <5; i++) {
+            let sphereRadius = 0.2;
+            let life = new Life(sphereRadius, 10.0 + (i * 0.7), 15.75, 0);
+            this.lifeVector.push(life);
+        }
+
+        this.updateLife();
+    }
+
+    updateLife(){
+        for (let i = 0; i < 5; i++) {
+            this.scene.add(this.lifeVector[i].getObject());
+        }
+    }
 
     renderTiles(numRows, rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix) {
 
@@ -252,6 +276,7 @@ class Level {
             this.ballVector[i].update();
 
             if (this.ballVector[i].getPosition().y <= 0) {
+                this.incrementLife()
                 this.ballVector[i].deleteObject();
                 this.ballVector.splice(i, 1);
             }
@@ -284,6 +309,10 @@ class Level {
         this.resetTiles(this.numRows, this.rowSize);
     }
 
+    initLife(){
+        this.renderLife();
+    }
+
     sphereFollowBase() {
         let posVector = this.base.getPosition();
         this.ballVector[0].setPosition(posVector.x, posVector.y + this.base.height / 2 + this.ball.radius + 0.01, 0.0)
@@ -302,8 +331,12 @@ class Level {
         let base = new Base(baseHeight, baseWidth, 0.5, this.baseStartPos.x, this.baseStartPos.y, this.baseStartPos.z)
         let ball = new Ball(sphereRadius, this.baseStartPos.x, this.baseStartPos.y + 0.01 + baseHeight / 2 + sphereRadius, 0);
 
+
+
         this.ball = ball;
         this.base = base;
+
+
         GameState.ballId = this.ball.id;
         GameState.baseId = this.base.id;
 
@@ -315,6 +348,7 @@ class Level {
         this.scene.add(wallRight.getObject());
         this.scene.add(wallTop.getObject());
         this.scene.add(base.getObject());
+
         ball.scene = this.scene;
         this.scene.add(ball.getObject());
         this.ballVector.push(ball)

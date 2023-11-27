@@ -520,6 +520,33 @@ class Base extends Component {
     }
 }
 
+class Life extends Component {
+    constructor(radius, x, y, z) {
+        super();
+        let material = new THREE.MeshPhongMaterial({color: 'white', shininess: 200});
+        let sphereGeometry = new THREE.SphereGeometry(radius, 32, 16);
+        let sphereBox = new THREE.Mesh(sphereGeometry, material);
+        let bbSphere = new THREE.Box3().setFromObject(sphereBox);
+        sphereBox.position.set(x, y, z);
+        bbSphere.setFromObject(sphereBox);
+        this.boundingBox = bbSphere;
+        this.object = sphereBox;
+        this.radius = radius;
+        this.helper = new THREE.Box3Helper(this.boundingBox, 'white');
+        sphereBox.castShadow = true;
+    }
+
+    destroyLife() {
+        this.active = false;
+        this.object.visible = false;
+        this.object.removeFromParent();
+        this.object.geometry.dispose();
+        this.object.material.dispose();
+    }
+
+
+}
+
 class PowerUpTile extends Tile {
 
     _onCollect;
@@ -595,4 +622,4 @@ class PowerUpTile extends Tile {
 
 }
 
-export {Ball, Wall, Tile, Base, PowerUpTile}
+export {Ball, Wall, Tile, Base, PowerUpTile, Life}
