@@ -523,7 +523,7 @@ class Base extends Component {
 class Life extends Component {
     constructor(radius, x, y, z) {
         super();
-        let material = new THREE.MeshPhongMaterial({color: 'white', shininess: 200});
+        let material = new THREE.MeshPhongMaterial({color: 'red', shininess: 200});
         let sphereGeometry = new THREE.SphereGeometry(radius, 32, 16);
         let sphereBox = new THREE.Mesh(sphereGeometry, material);
         let bbSphere = new THREE.Box3().setFromObject(sphereBox);

@@ -239,7 +239,7 @@ function initLevel(levelNumber) {
         let matrix = [];
         matrix = data;
         level.initTileMatrix(matrix);
-        level.initLife();
+        level.initLife(5);
     })
 
 

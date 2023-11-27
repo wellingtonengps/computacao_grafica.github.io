@@ -210,26 +210,21 @@ class Level {
         }, 7000);
     }
 
-    incrementLife(){
+    decrementLife(){
         let obj = this.lifeVector.pop();
-        obj.visible = false;
+        this.scene.remove(obj.getObject())
 
-        console.log("lifes: " + this.lifeVector.length)
+        console.log("life: " + this.lifeVector.length)
     }
 
-    renderLife(){
-
-        for (let i = 0; i <5; i++) {
+    renderLife(lives){
+        for (let i = 0; i < lives; i++) {
             let sphereRadius = 0.2;
             let life = new Life(sphereRadius, 10.0 + (i * 0.7), 15.75, 0);
             this.lifeVector.push(life);
         }
 
-        this.updateLife();
-    }
-
-    updateLife(){
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < this.lifeVector.length; i++) {
             this.scene.add(this.lifeVector[i].getObject());
         }
     }
@@ -276,7 +271,7 @@ class Level {
             this.ballVector[i].update();
 
             if (this.ballVector[i].getPosition().y <= 0) {
-                this.incrementLife()
+                this.decrementLife();
                 this.ballVector[i].deleteObject();
                 this.ballVector.splice(i, 1);
             }
@@ -309,8 +304,8 @@ class Level {
         this.resetTiles(this.numRows, this.rowSize);
     }
 
-    initLife(){
-        this.renderLife();
+    initLife(lives){
+        this.renderLife(lives);
     }
 
     sphereFollowBase() {
