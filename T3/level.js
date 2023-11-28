@@ -22,6 +22,7 @@ class Level {
     ball;
     base;
     totalTiles;
+    totalLives = 5;
     tileMatrix = [];
     lifeVector = [];
     _camera;
@@ -225,6 +226,7 @@ class Level {
     }
 
     decrementLife(){
+        this.totalLives--;
         let obj = this.lifeVector.pop();
         this.scene.remove(obj.getObject())
 
@@ -292,6 +294,10 @@ class Level {
 
         if (this.ballVector.length === 0) {
             this.decrementLife();
+            this.onLifeOver();
+        }
+
+        if (this.totalLives === 0) {
             this.onGameOver();
         }
 
@@ -427,6 +433,10 @@ class Level {
 
     setOnGameOver(func) {
         this.onGameOver = func;
+    }
+
+    setOnLifeOver(func) {
+        this.onLifeOver = func;
     }
 
     setOnWinGame(func) {

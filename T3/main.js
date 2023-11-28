@@ -9,6 +9,8 @@ import {Level} from "./level.js";
 import {readLevel} from "./utils.js";
 import {OrbitControls} from "../build/jsm/controls/OrbitControls.js";
 import {SoundManager} from "./soundManager.js";
+import {ColladaLoader} from "../build/jsm/loaders/ColladaLoader.js";
+
 
 // Initial variables
 let gamePaused = false;
@@ -41,6 +43,52 @@ window.addEventListener(
 );
 let timer;
 
+// Create the loading manager
+const loadingManager = new THREE.LoadingManager( () => {
+    let loadingScreen = document.getElementById( 'loading-screen' );
+    loadingScreen.transition = 0;
+    loadingScreen.style.setProperty('--speed1', '0');
+    loadingScreen.style.setProperty('--speed2', '0');
+    loadingScreen.style.setProperty('--speed3', '0');
+
+    let button1 = document.getElementById("myBtn");
+    let button2 = document.getElementById("myBtn2");
+    let button3 = document.getElementById("myBtn3");
+
+    // Set initial styles and event listeners
+    button1.style.backgroundColor = 'Red';
+    button1.innerHTML = 'Iniciar';
+    button1.addEventListener("click", onButtonPressed);
+
+    button2.style.backgroundColor = 'Green';
+    button2.innerHTML = 'Reiniciar';
+    button2.addEventListener("click", onButtonPressed);
+
+    button3.style.backgroundColor = 'Blue';
+    button3.innerHTML = 'Você Venceu';
+    button3.addEventListener("click", onButtonPressed);
+});
+
+function showSection(sectionId) {
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        section.style.display = (section.id === sectionId) ? 'block' : 'none';
+    });
+}
+
+
+
+loadColladaObject( ' ../assets/objects/stormtrooper/stormtrooper.dae');
+
+
+function loadColladaObject( object)
+{
+    const loader = new ColladaLoader( loadingManager );
+    loader.load( object, ( collada ) => {
+        initLevel(levelNumber);
+        render();
+    } );
+}
 function startSpeedTimer(){
     timer = window.setInterval((e)=>{
         if(ballSpeed <=0.2){
@@ -53,6 +101,34 @@ function startSpeedTimer(){
     }, 1000);
 }
 
+function onButtonPressed() {
+
+    let activeSection = event.currentTarget.closest('section');
+    /*
+    if (activeSection.id === 'loading-screen') {
+        showSection('game-screen')
+    } else if (activeSection.id === 'restart-screen') {
+        showSection('game-screen')
+        restartGame();
+    } else if (activeSection.id === 'win-screen') {
+        showSection('game-screen')
+        restartGame();
+    }*/
+    if (activeSection.id === 'loading-screen') {
+        showSection('game-screen')
+    } else {
+        showSection('game-screen')
+        restartGame();
+    }
+
+}
+
+function load(manager, levelNumber){
+    const loader = new ColladaLoader( manager );
+    loader.load(levelNumber, (collada) => {
+        initLevel(levelNumber);
+    })
+}
 
 function onWindowResize(camera, renderer, frustumSize = 16) {
     let w = window.innerWidth;
@@ -142,15 +218,24 @@ function checkGameOver(){
     }
 }
 
-function gameOver(){
+function lifeOver(){
     startGame(false);
     level.resetBall();
-    window.clearInterval(timer)
+    window.clearInterval(timer);
 }
+
+function gameOver() {
+    startGame(false);
+    level.resetBall();
+    window.clearInterval(timer);
+    showSection('restart-screen');
+}
+
 
 function winGame(){
     pauseGame(true);
     nextLevel();
+    showSection('win-screen')
 }
 
 
@@ -247,6 +332,7 @@ function initLevel(levelNumber) {
     level.createBackgroundPlane(scene);
     level.initCamera(scene);
     level.initLight(scene);
+    level.setOnLifeOver(lifeOver.bind(this));
     level.setOnGameOver(gameOver.bind(this));
     level.setOnWinGame(winGame.bind(this));
 
@@ -255,15 +341,11 @@ function initLevel(levelNumber) {
     orbitControls.update()
     orbitControls.enabled = false;
     onWindowResize(level.camera, renderer);
-
-
-
 }
 
 
-
-initLevel(levelNumber);
-render();
+//initLevel(levelNumber);
+//render();
 
 function render() {
     keyboardUpdate();

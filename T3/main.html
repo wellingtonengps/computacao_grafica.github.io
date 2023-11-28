@@ -2,10 +2,8 @@
 <html>
   <head>
     <title>Basic Scene</title>
-
-    <link rel="shortcut icon" href="../favicon.ico" />
-    <link rel="stylesheet" href="../html/resources/default.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../html/resources/loadingScreen.css">
   </head>
 
   <body>
@@ -17,9 +15,28 @@
     <script type="importmap">
       { "imports": { "three": "../build/three.module.js" } }
     </script>
-    <!--<div style="position: fixed; z-index: 2"><p>Aloooo</p></div>-->
-    <div id="webgl-output">
-      <script type="module" src="main.js"></script>
-    </div>
+
+    <section id="loading-screen">
+      <div id="loader"></div>
+      <button class="button" id="myBtn">Loading...</button>
+    </section>
+
+    <section id="restart-screen">
+      <div id="restart"></div>
+      <button class="button" id="myBtn2">Reiniciar</button>
+    </section>
+
+    <section id="win-screen">
+      <div id="wind"></div>
+      <button class="button" id="myBtn3">Você Venceu</button>
+    </section>
+
+    <section id="game-screen">
+      <div id="webgl-output">
+        <script type="module" src="main.js"></script>
+      </div>
+    </section>
+
+
   </body>
 </html>

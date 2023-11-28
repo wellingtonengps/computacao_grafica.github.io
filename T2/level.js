@@ -202,7 +202,7 @@ class Level {
         }
 
         if (this.ballVector.length === 0) {
-            this.onGameOver();
+            this.onLifeOver();
         }
 
         if (this.hits === this.totalTiles) {
