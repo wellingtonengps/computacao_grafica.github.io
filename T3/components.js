@@ -488,7 +488,7 @@ class Base extends Component {
     createCSGBase(height, width, depth) {
         let mat = new THREE.MeshPhongMaterial({color: 'red', shininess: 500});
         let cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(width, width, depth))
-        let cylinderMesh = new THREE.Mesh(new THREE.CylinderGeometry(width / 2, width / 2, depth, 20))
+        let cylinderMesh = new THREE.Mesh(new THREE.CylinderGeometry(width / 2, width / 2, depth, 36))
 
         cubeMesh.position.set(0, -height - (width / 2 - height + height / 2), 0)
         cubeMesh.matrixAutoUpdate = false;

@@ -335,8 +335,8 @@ class Level {
     initGameScene() {
         let sphereRadius = 0.2;
         this.baseStartPos = new THREE.Vector3(4.0, 2.0, 0.0)
-        let baseHeight = 0.5;
-        let baseWidth = 2.0;
+        let baseHeight = 0.35;
+        let baseWidth = 4.0;
 
         let wallTop = new Wall(9.25, 0.5, 0.5, 4.625, 15.75, 0.0);
         let wallLeft = new Wall(0.5, 18, 0.5, 0.25, 8.0, 0.0);
