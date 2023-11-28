@@ -169,11 +169,14 @@ class Tile extends Component {
     sound1;
     sound2;
     sound3;
+    static TYPE_INDESTRUCTIBLE = 2;
+    static TYPE_COMMON = 0;
+    static TYPE_HARD = 1;
 
-    constructor(width, height, depth, x, y, z, color, maxHits = 1) {
+    constructor(width, height, depth, x, y, z, color, type = 1) {
         super();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
-        let material = new THREE.MeshLambertMaterial({color: getColor(maxHits)})
+        let material = new THREE.MeshLambertMaterial({color: getColor(type)})
         let box = new THREE.Mesh(boxGeometry, material);
 
         let listener = new THREE.AudioListener();
@@ -186,16 +189,24 @@ class Tile extends Component {
 
 
 
-        if(maxHits == 2){
+        if(type == 2){
             let textureLoader = new THREE.TextureLoader();
             let texture  = textureLoader.load('assets/textures/stripes.png');
             box.material = new THREE.MeshLambertMaterial({color: "white"});
             box.material.map = texture;
+            this.type = Tile.TYPE_HARD;
+            this.maxhits = 2;
 
            this.soundEffect = SoundManager.createSound(box, 'assets/sounds/bloco2.mp3')
 
-        }else{
+        }else if(type >2){
+            this.maxhits = 1;
+            this.type = Tile.TYPE_COMMON;
             this.soundEffect = SoundManager.createSound(box, 'assets/sounds/bloco1.mp3')
+
+        }else if (type === 1){
+
+            this.type = Tile.TYPE_INDESTRUCTIBLE;
 
         }
        // box.material.map = createTextTeture("AAAAA")
@@ -211,7 +222,7 @@ class Tile extends Component {
         this.width = width;
         this.height = height;
         box.castShadow = true;
-        this.maxHits = maxHits;
+        //this.type = type;
 
         let edgesGeometry = new THREE.EdgesGeometry(boxGeometry); // or WireframeGeometry( geometry )
         let lineMaterial = new THREE.LineBasicMaterial({color: "black", linewidth: 1});
@@ -219,11 +230,9 @@ class Tile extends Component {
 
         this.wireframe = wireframe;
 
-        if (maxHits > 2) {
-            this.maxHits = 1;
-        }
-
-
+       /* if (type > 2) {
+            this.type = 1;
+        }*/
 
     }
 
@@ -234,16 +243,15 @@ class Tile extends Component {
             this.sound3.play()
         }
 
-        else if(this.maxHits ===1){
+        else if(this.type === Tile.TYPE_COMMON){
 
             //SoundManager.play('bloco1')
             this.sound1.play()
 
         }
 
-        else if(this.maxHits ===2){
+        else if(this.type === Tile.TYPE_INDESTRUCTIBLE || this.type === Tile.TYPE_HARD){
             this.sound2.play()
-
 
             // SoundManager.play('bloco2')
         }
@@ -284,7 +292,7 @@ class Tile extends Component {
             this.hits++;
            // this.soundEffect.play();
             this.playSoundEffect(object);
-            if (this.hits === this.maxHits) {
+            if (this.hits === this.maxhits && this.type !== Tile.TYPE_INDESTRUCTIBLE) {
                 this.active = false;
                 this.object.visible = false;
 
@@ -402,8 +410,9 @@ class Ball extends Component {
                 addedNormalVectors = addedNormalVectors.add(normal);
             }
             addedNormalVectors = addedNormalVectors.normalize();
+            let lastCollided = this.collidedWith[this.collidedWith.length-1]
 
-            if(this.state !== Ball.STATE_UNSTOPPABLE || !(this.collidedWith[this.collidedWith.length-1] instanceof Tile)) {
+            if(this.state !== Ball.STATE_UNSTOPPABLE || !( lastCollided instanceof Tile)) {
                 this.movementDirection = this.movementDirection.reflect(addedNormalVectors);
             }
 

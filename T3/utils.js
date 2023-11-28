@@ -39,12 +39,13 @@ function getRows(matrix){
     return matrix.length;
 }
 
-function getTotalTails(matrix) {
+function getTotalTiles(matrix, countIndestructible=false) {
     let count = 0;
 
     for (let i = 0; i < matrix.length; i++) {
         for (let j = 0; j < matrix[i].length; j++) {
-            if (matrix[i][j] !== 0) {
+            if ((matrix[i][j] !== 0 && matrix[i][j] !==1) ||
+                (countIndestructible && matrix[i][j]===1)) {
                 count++;
             }
         }
@@ -163,4 +164,4 @@ function createTextTexture(text){
 }
 
 
-export {createTextTexture, generateColor, readLevel, getColumns, getRows, getColor, getTotalTails, loadGLTFFile}
+export {createTextTexture, generateColor, readLevel, getColumns, getRows, getColor, getTotalTiles, loadGLTFFile}

@@ -5,7 +5,7 @@ import {
 } from "../libs/util/util.js";
 import {Ball, Base, Wall, Tile, PowerUpTile, Life} from "./components.js";
 import {CollisionManager} from "./collisionManager.js";
-import {generateColor, getColumns, getRows, getTotalTails, loadGLTFFile} from "./utils.js";
+import {generateColor, getColumns, getRows, getTotalTiles, loadGLTFFile} from "./utils.js";
 import {CSG} from "../libs/other/CSGMesh.js";
 import {GameState} from "./gameState.js";
 import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
@@ -285,13 +285,13 @@ class Level {
             this.ballVector[i].update();
 
             if (this.ballVector[i].getPosition().y <= 0) {
-                this.decrementLife();
                 this.ballVector[i].deleteObject();
                 this.ballVector.splice(i, 1);
             }
         }
 
         if (this.ballVector.length === 0) {
+            this.decrementLife();
             this.onGameOver();
         }
 
@@ -315,7 +315,7 @@ class Level {
         let tileHeight = 0.40;
         this.rowSize = getColumns(matrix);
         this.numRows = getRows(matrix);
-        this.totalTiles = getTotalTails(matrix);
+        this.totalTiles = getTotalTiles(matrix);
 
 
         this.renderTiles(this.numRows, this.rowSize, tileWidth, tileHeight, tileWallStartX, tileWallStartY, matrix);
