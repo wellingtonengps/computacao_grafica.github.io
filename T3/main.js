@@ -288,7 +288,7 @@ function render() {
         //checkWinGame();
     }
 
-    requestAnimationFrame(render);
-    renderer.render(scene, level.camera); // Render scene
 
+    renderer.render(scene, level.camera); // Render scene
+    requestAnimationFrame(render);
 }
