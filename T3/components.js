@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {setDefaultMaterial,} from "../libs/util/util.js";
 import {GameState} from "./gameState.js";
 import {CSG} from "../libs/other/CSGMesh.js";
-import {getColor, loadGLTFFile} from "./utils.js";
+import {createTextTexture, getColor, loadGLTFFile} from "./utils.js";
 import {SoundManager} from "./soundManager.js";
 
 
@@ -198,6 +198,7 @@ class Tile extends Component {
             this.soundEffect = SoundManager.createSound(box, 'assets/sounds/bloco1.mp3')
 
         }
+       // box.material.map = createTextTeture("AAAAA")
 
 
         let bbBox = new THREE.Box3().setFromObject(box);
@@ -550,15 +551,27 @@ class Life extends Component {
 class PowerUpTile extends Tile {
 
     _onCollect;
+    _onDestroy;
 
     constructor(width, height, depth, x, y, z, color, type) {
         super();
         let textureLoader = new THREE.TextureLoader();
         let boxGeometry = new THREE.BoxGeometry(width, height, depth);
-        let capsuleGeometry = new THREE.CapsuleGeometry(height, width, 16, 16);
-        let texture  = textureLoader.load(type === 0? 'assets/textures/stripes.png':'assets/textures/wood.png');
-        let material = new THREE.MeshLambertMaterial({color: "rgb(255,255,255)"})
-        material.map = texture;
+        //let capsuleGeometry = new THREE.CapsuleGeometry(height, width, 16, 16);
+        let texture  = type === 0? createTextTexture("T"):createTextTexture("S");
+        //let texture  = createTextTeture("T");
+        //let material = new THREE.MeshLambertMaterial({color: "white"})
+        let material = new THREE.MeshLambertMaterial({
+            color: "white",
+            map: texture,
+            side: THREE.DoubleSide,
+        });
+
+        let capsuleGeometry = new THREE.CapsuleGeometry(0.15, 0.40, 16, 16);
+        capsuleGeometry.rotateY(Math.PI);
+
+        // material.map = texture;
+
         let box = new THREE.Mesh(capsuleGeometry, material);
         let bbBox = new THREE.Box3().setFromObject(box);
         box.position.set(x, y, z)
@@ -578,12 +591,18 @@ class PowerUpTile extends Tile {
     }
 
 
+
+
     get onCollect() {
         return this._onCollect;
     }
 
     set onCollect(value) {
         this._onCollect = value;
+    }
+
+    set onDestroy(func){
+        this._onDestroy = func;
     }
 
     update() {
@@ -593,6 +612,7 @@ class PowerUpTile extends Tile {
         this.setPosition(pos.x, pos.y - this.fallSpeed, pos.z);
 
         if (this.getPosition().y <= 0) {
+            this._onDestroy();
             this.destroyTile()
         }
     }

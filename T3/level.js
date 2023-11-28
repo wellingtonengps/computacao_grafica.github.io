@@ -34,6 +34,9 @@ class Level {
     _ballSpeed = 0;
     blockBeforePowerUp = 0;
     timer;
+    powerUpGenerated = false;
+    powerUpIIOn = false;
+    powerUpIOn = false;
 
     startTimer(){
 
@@ -43,6 +46,7 @@ class Level {
     constructor(scene) {
         this.scene = scene;
         this.hits = 0;
+
 
     }
 
@@ -64,7 +68,7 @@ class Level {
 
     resetCamera() {
 
-        camera.position.set(4.625, 8, 19.5)
+        this._camera.position.set(4.625, 8, 19.5)
         this._camera.lookAt(4.625, 8, 0);
         this._camera.updateProjectionMatrix();
     }
@@ -139,15 +143,16 @@ class Level {
         let tileHeight = 0.40;
         let rand =  Math.floor(Math.random() * 2);
 
-        if (this.ballVector.length <= 2) {
+        if (!this.powerUpIIOn && !this.powerUpIOn) {
             this.blockBeforePowerUp++;
             console.log("blockBeforePowerUp: " + this.blockBeforePowerUp)
         }
 
-        if (this.blockBeforePowerUp === 10 && this.ballVector.length <= 2) {
+        if (this.blockBeforePowerUp === 10 && !this.powerUpIIOn && !this.powerUpIOn) {
             this.blockBeforePowerUp = 0;
             let pos = object.getPosition()
             let tile ;
+            this.powerUpGenerated = true;
 
             if(rand === 0){
                 tile = new PowerUpTile(tileWidth/2, tileHeight/2, 0.5, pos.x, pos.y, 0, generateColor(), 0)
@@ -156,6 +161,8 @@ class Level {
                 tile = new PowerUpTile(tileWidth/2, tileHeight/2, 0.5, pos.x, pos.y, 0, generateColor(), 1)
                 tile.onCollect = this.powerUpII.bind(this);
             }
+
+            tile.onDestroy = this.onPowerUpDestroy.bind(this);
 
             tile.scene = this.scene;
             this.scene.add(tile.getObject());
@@ -182,8 +189,10 @@ class Level {
     powerUpI(object) {
        // let rand =  Math.floor(Math.random() * 2);
         object.deleteObject();
+        this.powerUpIOn = true;
 
-       // if(rand ===0){
+
+        // if(rand ===0){
             if(this.ballVector.length === 2){
                 this.addBall();
             }else if(this.ballVector.length===1){
@@ -198,7 +207,7 @@ class Level {
     }
 
     powerUpII(object) {
-
+        this.powerUpIIOn = true;
         while(this.ballVector.length > 1){
             this.ballVector.pop().deleteObject();
         }
@@ -207,7 +216,12 @@ class Level {
         this.timer = window.setInterval((e)=>{
             this.ballVector[0].state = Ball.STATE_NORMAL;
             window.clearInterval(this.timer)
+            this.powerUpIIOn = false;
         }, 7000);
+    }
+
+    onPowerUpDestroy(){
+        this.powerUpGenerated = false;
     }
 
     decrementLife(){
@@ -279,6 +293,10 @@ class Level {
 
         if (this.ballVector.length === 0) {
             this.onGameOver();
+        }
+
+        if(this.ballVector.length <= 2){
+            this.powerUpIOn = false;
         }
 
         if (this.hits === this.totalTiles) {

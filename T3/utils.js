@@ -141,5 +141,26 @@ function loadOBJFile(modelPath, modelName, desiredScale, angle, visibility, scen
     });
 }
 
+function createTextTexture(text){
+    let c = document.createElement("canvas");
+    c.width = 56;
+    c.height = 1024;
+    let ctx = c.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "black";
+    ctx.font = "bold 12px Arial";
+    ctx.fillText(text, c.width * 0.5, c.height * 0.5);
+    ctx.strokeStyle = "black";
+    ctx.strokeText(text, c.width * 0.5, c.height * 0.5);
+    let tex = new THREE.CanvasTexture(c);
+    tex.offset.y = 0.002;
 
-export {generateColor, readLevel, getColumns, getRows, getColor, getTotalTails, loadGLTFFile}
+
+    return tex;
+}
+
+
+export {createTextTexture, generateColor, readLevel, getColumns, getRows, getColor, getTotalTails, loadGLTFFile}
