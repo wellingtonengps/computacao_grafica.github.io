@@ -239,7 +239,6 @@ function winGame(){
     pauseGame(true);
     nextLevel();
 
-    console.log(levelNumber)
 
     if(levelNumber === 4){
         showSection('win-screen')
@@ -351,7 +350,7 @@ function initLevel(levelNumber) {
     onWindowResize(level.camera, renderer);
 }
 
-
+showSection('loading-screen');
 initLevel(levelNumber);
 render();
 
