@@ -236,7 +236,7 @@ class Level {
     renderLife(lives){
         for (let i = 0; i < lives; i++) {
             let sphereRadius = 0.2;
-            let life = new Life(sphereRadius, 10.0 + (i * 0.7), 15.75, 0);
+            let life = new Life(sphereRadius, 5.0 + (i * 0.7), 15.4, 1);
             this.lifeVector.push(life);
         }
 

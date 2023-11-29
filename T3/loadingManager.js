@@ -15,7 +15,7 @@ class LoadingManager{
 
 
             button1.style.backgroundColor = 'Red';
-            button1.innerHTML = 'Iniciar';
+            button1.innerHTML = 'Start';
             button1.addEventListener("click", onButtonPressed);
 
             button2.style.backgroundColor = 'Green';
