@@ -453,9 +453,33 @@ class Base extends Component {
         this.width = 2 * Math.sqrt(Math.pow((width / 2), 2) - Math.pow((width / 2 - height), 2));
         this.depth = depth;
         let baseGeometry = new THREE.BoxGeometry(width, height, depth);
-        let base2 = new THREE.Mesh(baseGeometry, material);
+        //let base2 = new THREE.Mesh(baseGeometry, material);
         let base = this.createCSGBase(height, width, depth);
         let bbBase = new THREE.Box3().setFromObject(base);
+        base.material = new THREE.MeshLambertMaterial({color: "white"});
+
+        let geometry = base.geometry;
+        let material = base.material;
+
+        // You must set an individual UV coordinate for each vertex of your scene
+        // Learn more here:
+        // https://discoverthreejs.com/book/first-steps/textures-intro/
+      /*  var uvCoords = [0.0, 0.0,
+            0.3, 1.0,
+            0.5, 0.0,
+            0.7, 1.0,
+            1.0, 0.0];
+
+        geometry.setAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( uvCoords), 2 ) );
+*/
+        // Load the texture and set to the material of the mesh
+        //let texture  = textureLoader.load('assets/textures/stripes.png');
+
+        let texture = new THREE.TextureLoader().load('assets/textures/stripes.png');
+        material.map =  texture;
+
+
+
         this.object = base;
         this.boundingBox = bbBase;
         base.position.set(x, y, z);
@@ -571,7 +595,7 @@ class PowerUpTile extends Tile {
         //let texture  = createTextTeture("T");
         //let material = new THREE.MeshLambertMaterial({color: "white"})
         let material = new THREE.MeshLambertMaterial({
-            color: "white",
+            color: type === 0?"white": "yellow",
             map: texture,
             side: THREE.DoubleSide,
         });
@@ -619,6 +643,7 @@ class PowerUpTile extends Tile {
 
         let pos = this.getPosition();
         this.setPosition(pos.x, pos.y - this.fallSpeed, pos.z);
+        this.object.rotateZ(this.fallSpeed)
 
         if (this.getPosition().y <= 0) {
             this._onDestroy();
