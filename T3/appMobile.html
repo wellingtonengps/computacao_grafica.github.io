@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basic Scene</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../T3/loadingScreen.css">
+</head>
+
+<body>
+<!-- Import maps polyfill -- Remove this when import maps will be widely supported-->
+<script
+        async
+        src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+></script>
+<script type="importmap">
+    { "imports": { "three": "../build/three.module.js" } }
+</script>
+
+<section id="loading-screen">
+    <div id="loader"></div>
+    <button class="button" id="myBtn">Loading...</button>
+</section>
+
+<section id="restart-screen">
+    <div id="restart"></div>
+    <button class="button" id="myBtn2">Reiniciar</button>
+</section>
+
+<section id="win-screen">
+    <div id="wind"></div>
+    <button class="button" id="myBtn3">Jogar Novamente</button>
+</section>
+
+<div id="button">
+    <button style="width: 40px; height: 40px" class="button" id="myBtn4">A</button>
+</div>
+
+<section id="game-screen">
+    <div id="webgl-output">
+        <script type="module" src="appMobile.js"></script>
+    </div>
+</section>
+
+</body>
+</html>

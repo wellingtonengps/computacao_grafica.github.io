@@ -5,9 +5,6 @@ import {CSG} from "../libs/other/CSGMesh.js";
 import {createTextTexture, getColor, loadGLTFFile} from "./utils.js";
 import {SoundManager} from "./soundManager.js";
 
-
-
-
 let material = setDefaultMaterial();
 
 class Component {

@@ -26,6 +26,7 @@ let dragControl;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.VSMShadowMap;
 
+
 let level;
 let mouse = new THREE.Vector2();
 let levelNumber= 1;
@@ -80,6 +81,18 @@ function showSection(sectionId) {
     });
 }
 
+export function setOnMobile(value) {
+    onMobile = value;
+
+    if(onMobile){
+        let button = document.getElementById("myBtn4")
+        button.addEventListener("click", () => {
+            level.shootBall(new THREE.Vector3(0,1,0))
+            startGame(true);
+            startSpeedTimer();
+        });
+    }
+}
 
 
 //loadColladaObject( ' ../assets/objects/stormtrooper/stormtrooper.dae');
@@ -160,7 +173,7 @@ function onMouseMove(event) {
 }
 
 function onMouseClick(event){
-    if(event.button === 0 && gameStarted === false){
+    if(event.button === 0 && gameStarted === false && onMobile === false){
         level.shootBall(new THREE.Vector3(0,1,0))
         startGame(true);
         startSpeedTimer();
@@ -194,7 +207,6 @@ function keyboardUpdate() {
         level.resetCamera();
         orbitControls.enabled = !orbitControls.enabled;
     }
-
 }
 
 function restartGame() {
@@ -255,7 +267,6 @@ function pauseGame(status){
 function startGame(status) {
     gameStarted = status;
     ballSpeed = initialBallSpeed;
-
 }
 
 function nextLevel() {
@@ -398,6 +409,7 @@ function initLevel(levelNumber) {
     }
 }
 
+
 showSection('loading-screen');
 initLevel(levelNumber);
 render();
@@ -408,7 +420,7 @@ function render() {
 
     if(!gameStarted){
         if(onMobile){
-            dragControl.activate()
+            //dragControl.activate()
         }else{
             moveBaseToRaycasterXPosition();
         }
@@ -421,7 +433,7 @@ function render() {
 
     }else if(!gamePaused){
         if(onMobile){
-            dragControl.activate()
+            //dragControl.activate()
         }else{
             moveBaseToRaycasterXPosition();
         }
