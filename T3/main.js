@@ -11,6 +11,7 @@ import {OrbitControls} from "../build/jsm/controls/OrbitControls.js";
 import {SoundManager} from "./soundManager.js";
 import {ColladaLoader} from "../build/jsm/loaders/ColladaLoader.js";
 import {LoadingManager} from "./loadingManager.js";
+import {DragControls} from "../build/jsm/controls/DragControls.js";
 
 
 // Initial variables
@@ -20,7 +21,8 @@ var keyboard = new KeyboardState();
 let scene; // Create main scene
 let renderer = initRenderer();
 let orbitControls;
-
+let onMobile = false;
+let dragControl;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.VSMShadowMap;
 
@@ -348,6 +350,52 @@ function initLevel(levelNumber) {
     orbitControls.update()
     orbitControls.enabled = false;
     onWindowResize(level.camera, renderer);
+
+    if(onMobile){
+        let sphereGeometry = new THREE.SphereGeometry(0.2, 10,10)
+        let material = new THREE.MeshPhongMaterial({color: "red", opacity:0.5})
+        material.transparent = true
+        let sphere = new THREE.Mesh(sphereGeometry, material)
+        sphere.position.set(level.base.getPosition().x, level.base.getPosition().y-0.5, level.base.getPosition().z+1)
+        scene.add(sphere)
+
+        dragControl = new DragControls([sphere], level.camera, renderer.domElement);
+
+        // add event listener to highlight dragged objects
+        dragControl.addEventListener('dragstart', function (event) {
+            event.object.material.emissive.set(0x333333);
+        });
+
+        dragControl.addEventListener('drag', function (event) {
+            //event.object.position.y = level.base.getPosition().y;
+            //event.object.position.z = level.base.getPosition().z;
+            let obj = event.object;
+            let base = level.base;
+            let baseWidth = base.width;
+
+            let x = obj.position.x;
+
+            obj.position.set(x, 2.0-0.5, 1.0)
+            base.setPosition(x, 2.0, 0.0)
+
+            if (x <= 0.50 + baseWidth/2) {
+                //todo: tirar números mágicos
+                obj.position.set(0.50 + baseWidth/2, 2.0-0.5, 1.0)
+                base.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
+                //ball.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
+            } else if (x >= 9.25 - 0.5 - baseWidth/2) {
+                obj.position.set(9.25 - 0.5 - baseWidth/2, 2.0-0.5, 1.0)
+                base.setPosition(9.25 - 0.5 - baseWidth/2, 2.0, 0.0)
+            }
+
+        });
+
+        dragControl.addEventListener('dragend', function (event) {
+            event.object.material.emissive.set(0x000000);
+        });
+
+        //dragControl.activate()
+    }
 }
 
 showSection('loading-screen');
@@ -359,7 +407,12 @@ function render() {
     infoBox.changeMessage("Speed: " +  ballSpeed.toFixed(2))
 
     if(!gameStarted){
-        moveBaseToRaycasterXPosition();
+        if(onMobile){
+            dragControl.activate()
+        }else{
+            moveBaseToRaycasterXPosition();
+        }
+
         sphereFollowBase()
         //level.base.update();
         //level.ball.update();
@@ -367,7 +420,11 @@ function render() {
 
 
     }else if(!gamePaused){
-        moveBaseToRaycasterXPosition();
+        if(onMobile){
+            dragControl.activate()
+        }else{
+            moveBaseToRaycasterXPosition();
+        }
         //level.base.update();
         level.ballSpeed = ballSpeed;
         //level.ball.update();
