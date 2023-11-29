@@ -59,17 +59,17 @@ class Level {
 
 
         camera.position.set(4.625, -20, 25)
+        camera.lookAt(4.625, 8, 0);
         this._camera = camera;
+        this._camera.updateProjectionMatrix();
 
-        camera.lookAt(4.625, 90, 1);
-        camera.updateProjectionMatrix();
     }
 
 
 
     resetCamera() {
 
-        this._camera.position.set(4.625, 8, 19.5)
+        this._camera.position.set(4.625, -20, 25)
         this._camera.lookAt(4.625, 8, 0);
         this._camera.updateProjectionMatrix();
     }
