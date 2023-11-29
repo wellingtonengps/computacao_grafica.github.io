@@ -3,6 +3,8 @@ import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
 import {OBJLoader} from '../build/jsm/loaders/OBJLoader.js';
 import {MTLLoader} from '../build/jsm/loaders/MTLLoader.js';
 import * as THREE from "three";
+import {LoadingManager} from "./loadingManager.js";
+import {onButtonPressed} from "./main.js";
 
 function generateColor() {
     let colorPalette = [
@@ -67,7 +69,7 @@ function readLevel(path, level, callback) {
 
 function loadGLTFFile(modelPath, modelName, desiredScale, angle, visibility, object)
 {
-    var loader = new GLTFLoader( );
+    var loader = new GLTFLoader( LoadingManager.loading(onButtonPressed) );
     let returnObj ={a:(obj)=> console.log(obj)};
     loader.load( modelPath + modelName + '.glb', function ( gltf ) {
         var obj = gltf.scene;

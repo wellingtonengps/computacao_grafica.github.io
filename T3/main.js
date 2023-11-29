@@ -10,6 +10,7 @@ import {readLevel} from "./utils.js";
 import {OrbitControls} from "../build/jsm/controls/OrbitControls.js";
 import {SoundManager} from "./soundManager.js";
 import {ColladaLoader} from "../build/jsm/loaders/ColladaLoader.js";
+import {LoadingManager} from "./loadingManager.js";
 
 
 // Initial variables
@@ -44,6 +45,7 @@ window.addEventListener(
 let timer;
 
 // Create the loading manager
+/*
 const loadingManager = new THREE.LoadingManager( () => {
     let loadingScreen = document.getElementById( 'loading-screen' );
     loadingScreen.transition = 0;
@@ -55,7 +57,7 @@ const loadingManager = new THREE.LoadingManager( () => {
     let button2 = document.getElementById("myBtn2");
     let button3 = document.getElementById("myBtn3");
 
-    // Set initial styles and event listeners
+
     button1.style.backgroundColor = 'Red';
     button1.innerHTML = 'Iniciar';
     button1.addEventListener("click", onButtonPressed);
@@ -65,9 +67,9 @@ const loadingManager = new THREE.LoadingManager( () => {
     button2.addEventListener("click", onButtonPressed);
 
     button3.style.backgroundColor = 'Blue';
-    button3.innerHTML = 'Você Venceu';
+    button3.innerHTML = 'Jogar novamente';
     button3.addEventListener("click", onButtonPressed);
-});
+});*/
 
 function showSection(sectionId) {
     const sections = document.querySelectorAll('section');
@@ -78,17 +80,18 @@ function showSection(sectionId) {
 
 
 
-loadColladaObject( ' ../assets/objects/stormtrooper/stormtrooper.dae');
+//loadColladaObject( ' ../assets/objects/stormtrooper/stormtrooper.dae');
 
-
+/*
 function loadColladaObject( object)
 {
-    const loader = new ColladaLoader( loadingManager );
+
+    const loader = new ColladaLoader( LoadingManager.loading(onButtonPressed) );
     loader.load( object, ( collada ) => {
         initLevel(levelNumber);
         render();
     } );
-}
+}*/
 function startSpeedTimer(){
     timer = window.setInterval((e)=>{
         if(ballSpeed <=0.2){
@@ -101,7 +104,8 @@ function startSpeedTimer(){
     }, 1000);
 }
 
-function onButtonPressed() {
+
+export function onButtonPressed() {
 
     let activeSection = event.currentTarget.closest('section');
     /*
@@ -120,7 +124,6 @@ function onButtonPressed() {
         showSection('game-screen')
         restartGame();
     }
-
 }
 
 function load(manager, levelNumber){
@@ -344,8 +347,8 @@ function initLevel(levelNumber) {
 }
 
 
-//initLevel(levelNumber);
-//render();
+initLevel(levelNumber);
+render();
 
 function render() {
     keyboardUpdate();

@@ -490,6 +490,8 @@ class Base extends Component {
         this.soundEffect = SoundManager.createSound(base, 'assets/sounds/rebatedor.mp3')
         loadGLTFFile('assets/objects/','UFO_Empty', 1.5, 180, true, base);
 
+
+
         /*base2.position.set(x, y, z);
         this.object = base2;*/
     }
