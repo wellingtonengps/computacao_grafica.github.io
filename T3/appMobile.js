@@ -1,3 +1,3 @@
-import {setOnMobile} from "./main.js";
+import {updateMobile} from "./main.js";
 
-setOnMobile(true);
+updateMobile(true);

@@ -81,24 +81,23 @@ function showSection(sectionId) {
     });
 }
 
-export function setOnMobile(value) {
+export function updateMobile(value) {
     onMobile = value;
 
     if(onMobile){
         let button = document.getElementById("myBtn4")
         button.addEventListener("click", () => {
+
             level.shootBall(new THREE.Vector3(0,1,0))
             startGame(true);
             startSpeedTimer();
         });
 
-        window.addEventListener(
-            "resize",
-            function () {
-                onWindowResize(level.camera, renderer);
-            },
-            false
-        );
+        let button5 = document.getElementById("myBtn5")
+        button5.addEventListener("click", () => {
+            onWindowResize(level.camera, renderer);
+            console.log("teste")
+        });
     }
 }
 
