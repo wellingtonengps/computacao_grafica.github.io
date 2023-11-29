@@ -23,7 +23,7 @@ class LoadingManager{
             button2.addEventListener("click", onButtonPressed);
 
             button3.style.backgroundColor = 'Blue';
-            button3.innerHTML = 'Jogar novamente';
+            button3.innerHTML = 'Jogar Novamente';
             button3.addEventListener("click", onButtonPressed);
         })
 

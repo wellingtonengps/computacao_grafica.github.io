@@ -238,7 +238,12 @@ function gameOver() {
 function winGame(){
     pauseGame(true);
     nextLevel();
-    showSection('win-screen')
+
+    console.log(levelNumber)
+
+    if(levelNumber === 4){
+        showSection('win-screen')
+    }
 }
 
 
