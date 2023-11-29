@@ -95,7 +95,7 @@ export function updateMobile(value) {
 
         let button5 = document.getElementById("myBtn5")
         button5.addEventListener("click", () => {
-            onWindowResize(level.camera, renderer);
+            toggleFullScreenMode();
             console.log("teste")
         });
     }

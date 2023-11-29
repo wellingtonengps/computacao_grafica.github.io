@@ -53,15 +53,15 @@ class Level {
 
     initCamera() {
         let aspect = 16 / 8;
-        let fov = 45;
+        let fov = 18;
 
-        let camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100);
+        let camera = new THREE.PerspectiveCamera(fov, aspect, 0.5, 100);
 
 
-        camera.position.set(4.625, 8, 19.5)
+        camera.position.set(4.625, -20, 25)
         this._camera = camera;
 
-        camera.lookAt(4.625, 8, 0);
+        camera.lookAt(4.625, 90, 1);
         camera.updateProjectionMatrix();
     }
 
