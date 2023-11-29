@@ -236,7 +236,7 @@ class Level {
     renderLife(lives){
         for (let i = 0; i < lives; i++) {
             let sphereRadius = 0.2;
-            let life = new Life(sphereRadius, 5.0 + (i * 0.7), 15.4, 1);
+            let life = new Life(sphereRadius, 10.0 + (i * 0.7), 15.4, 1);
             this.lifeVector.push(life);
         }
 
@@ -344,7 +344,7 @@ class Level {
         let baseHeight = 0.35;
         let baseWidth = 4.0;
 
-        let wallTop = new Wall(9.25, 0.5, 0.5, 4.625, 15.75, 0.0);
+        let wallTop = new Wall(9.25, 0.5, 0.5, 4.625, 17, 0.0);
         let wallLeft = new Wall(0.5, 18, 0.5, 0.25, 8.0, 0.0);
         let wallRight = new Wall(0.5, 18, 0.5, 9.00, 8.0, 0.0);
         let base = new Base(baseHeight, baseWidth, 0.5, this.baseStartPos.x, this.baseStartPos.y, this.baseStartPos.z)

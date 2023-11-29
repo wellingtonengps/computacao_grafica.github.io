@@ -370,11 +370,11 @@ function initLevel(levelNumber) {
     onWindowResize(level.camera, renderer);
 
     if(onMobile){
-        let sphereGeometry = new THREE.SphereGeometry(0.2, 10,10)
+        let sphereGeometry = new THREE.SphereGeometry(0.5, 10,10)
         let material = new THREE.MeshPhongMaterial({color: "red", opacity:0.5})
         material.transparent = true
         let sphere = new THREE.Mesh(sphereGeometry, material)
-        sphere.position.set(level.base.getPosition().x, level.base.getPosition().y-0.5, level.base.getPosition().z+1)
+        sphere.position.set(level.base.getPosition().x, level.base.getPosition().y-1.2, level.base.getPosition().z+1)
         scene.add(sphere)
 
         dragControl = new DragControls([sphere], level.camera, renderer.domElement);
@@ -393,16 +393,16 @@ function initLevel(levelNumber) {
 
             let x = obj.position.x;
 
-            obj.position.set(x, 2.0-0.5, 1.0)
+            obj.position.set(x, 2.0-1.2, 1.0)
             base.setPosition(x, 2.0, 0.0)
 
             if (x <= 0.50 + baseWidth/2) {
                 //todo: tirar números mágicos
-                obj.position.set(0.50 + baseWidth/2, 2.0-0.5, 1.0)
+                obj.position.set(0.50 + baseWidth/2, 2.0-1.2, 1.0)
                 base.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
                 //ball.setPosition(0.50 + baseWidth/2, 2.0, 0.0)
             } else if (x >= 9.25 - 0.5 - baseWidth/2) {
-                obj.position.set(9.25 - 0.5 - baseWidth/2, 2.0-0.5, 1.0)
+                obj.position.set(9.25 - 0.5 - baseWidth/2, 2.0-1.2, 1.0)
                 base.setPosition(9.25 - 0.5 - baseWidth/2, 2.0, 0.0)
             }
 
@@ -416,10 +416,14 @@ function initLevel(levelNumber) {
     }
 }
 
+export function start(value) {
+    updateMobile(value);
+    showSection('loading-screen');
+    initLevel(levelNumber);
+    render();
+}
 
-showSection('loading-screen');
-initLevel(levelNumber);
-render();
+
 
 function render() {
     keyboardUpdate();
@@ -427,7 +431,7 @@ function render() {
 
     if(!gameStarted){
         if(onMobile){
-            //dragControl.activate()
+            dragControl.activate()
         }else{
             moveBaseToRaycasterXPosition();
         }
@@ -440,7 +444,7 @@ function render() {
 
     }else if(!gamePaused){
         if(onMobile){
-            //dragControl.activate()
+            dragControl.activate()
         }else{
             moveBaseToRaycasterXPosition();
         }

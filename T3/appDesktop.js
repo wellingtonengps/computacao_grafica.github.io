@@ -1,3 +1,3 @@
 import {start} from "./main.js";
 
-start(true);
+start(false);
