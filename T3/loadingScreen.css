@@ -74,3 +74,15 @@ text-align: center;
 font-size: 20px;
 border-radius: 8px;
 }
+
+#button {
+  position: absolute;
+  top: 50%;
+  left: 80%;
+}
+
+#button2 {
+  position: absolute;
+  top:  35%;
+  left: 80%;
+}

@@ -91,6 +91,14 @@ export function setOnMobile(value) {
             startGame(true);
             startSpeedTimer();
         });
+
+        window.addEventListener(
+            "resize",
+            function () {
+                onWindowResize(level.camera, renderer);
+            },
+            false
+        );
     }
 }
 
